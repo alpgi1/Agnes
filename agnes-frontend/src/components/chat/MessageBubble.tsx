@@ -1,5 +1,6 @@
 import { AssistantMarkdown } from './AssistantMarkdown';
 import { ComplianceBadge } from './ComplianceBadge';
+import { GlowCard } from '@/components/ui/spotlight-card';
 import { AlertCircle, Code2, Sparkles, BookOpen } from 'lucide-react';
 import type { ChatMessage } from '@/api/types';
 
@@ -13,10 +14,10 @@ export function MessageBubble({ msg }: { msg: ChatMessage }) {
         <div className="w-8 h-8 rounded-full bg-red-500/20 border border-red-500/30 flex items-center justify-center shrink-0">
           <AlertCircle className="w-4 h-4 text-red-300" />
         </div>
-        <div className="flex-1 bg-red-500/5 border border-red-500/20 rounded-xl px-4 py-3">
+        <GlowCard customSize glowColor="red" className="flex-1 px-4 py-3">
           <div className="text-sm text-red-300 font-medium">Request failed</div>
           <div className="text-sm text-white/70 mt-1">{msg.error}</div>
-        </div>
+        </GlowCard>
       </div>
     );
   }
@@ -25,7 +26,7 @@ export function MessageBubble({ msg }: { msg: ChatMessage }) {
   if (isUser) {
     return (
       <div className="flex justify-end my-4">
-        <div className="max-w-[80%] bg-violet-500/20 border border-violet-500/30 rounded-2xl rounded-tr-sm px-4 py-2.5">
+        <GlowCard customSize glowColor="purple" className="max-w-[80%] px-4 py-2.5 rounded-2xl rounded-tr-sm">
           <div className="flex items-center gap-2 mb-1 text-xs text-violet-200/70">
             {msg.mode === 'optimize' ? (
               <Sparkles className="w-3 h-3" />
@@ -35,7 +36,7 @@ export function MessageBubble({ msg }: { msg: ChatMessage }) {
             <span className="capitalize">{msg.mode}</span>
           </div>
           <div className="text-sm text-white whitespace-pre-wrap">{msg.content}</div>
-        </div>
+        </GlowCard>
       </div>
     );
   }
@@ -47,7 +48,7 @@ export function MessageBubble({ msg }: { msg: ChatMessage }) {
         A
       </div>
       <div className="flex-1 min-w-0">
-        <div className="bg-white/[0.03] backdrop-blur-sm border border-white/10 rounded-xl rounded-tl-sm px-5 py-4">
+        <GlowCard customSize glowColor="blue" className="flex-1 min-w-0 px-5 py-4 rounded-xl rounded-tl-sm">
           {/* Compliance status + optimizers run */}
           {msg.metadata?.complianceStatus && (
             <div className="mb-3 flex items-center gap-2 flex-wrap">
@@ -108,7 +109,7 @@ export function MessageBubble({ msg }: { msg: ChatMessage }) {
               {(msg.metadata.durationMs / 1000).toFixed(1)}s
             </div>
           )}
-        </div>
+        </GlowCard>
       </div>
     </div>
   );
