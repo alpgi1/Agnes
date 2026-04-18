@@ -1,0 +1,23 @@
+package com.spherecast.agnes.handler.optimizers;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.List;
+
+public record Finding(
+        @JsonProperty("id") String id,
+        @JsonProperty("title") String title,
+        @JsonProperty("summary") String summary,
+        @JsonProperty("rationale") String rationale,
+        @JsonProperty("affected_skus") List<AffectedSku> affectedSkus,
+        @JsonProperty("estimated_impact") String estimatedImpact,
+        @JsonProperty("confidence") String confidence,
+        @JsonProperty("compliance_relevance") ComplianceRelevance complianceRelevance
+) {
+    public record AffectedSku(
+            @JsonProperty("company") String company,
+            @JsonProperty("product") String product,
+            @JsonProperty("ingredient") String ingredient,
+            @JsonProperty("note") String note
+    ) {}
+}

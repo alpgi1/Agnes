@@ -27,14 +27,22 @@ public class SqlExecutor {
     }
 
     public QueryResult executeReadOnly(String sql) {
+        return executeReadOnly(sql, MAX_ROWS_RETURNED);
+    }
+
+    public QueryResult executeReadOnly(String sql, int maxRows) {
+        if (maxRows <= 0) {
+            throw new IllegalArgumentException("maxRows must be > 0");
+        }
         long start = System.nanoTime();
+        int sentinel = maxRows + 1;
         try {
-            ResultSetExtractor<QueryResult> extractor = rs -> extract(rs, start);
+            ResultSetExtractor<QueryResult> extractor = rs -> extract(rs, start, maxRows);
             return jdbcTemplate.query(
                     conn -> {
                         PreparedStatement ps = conn.prepareStatement(sql);
                         ps.setQueryTimeout(QUERY_TIMEOUT_SECONDS);
-                        ps.setMaxRows(MAX_ROWS_WITH_SENTINEL);
+                        ps.setMaxRows(sentinel);
                         return ps;
                     },
                     extractor
@@ -45,7 +53,7 @@ public class SqlExecutor {
         }
     }
 
-    private QueryResult extract(ResultSet rs, long start) throws SQLException {
+    private QueryResult extract(ResultSet rs, long start, int maxRows) throws SQLException {
         ResultSetMetaData meta = rs.getMetaData();
         int colCount = meta.getColumnCount();
         List<String> columns = new ArrayList<>(colCount);
@@ -62,9 +70,9 @@ public class SqlExecutor {
             rows.add(row);
         }
 
-        boolean truncated = rows.size() > MAX_ROWS_RETURNED;
+        boolean truncated = rows.size() > maxRows;
         if (truncated) {
-            rows = new ArrayList<>(rows.subList(0, MAX_ROWS_RETURNED));
+            rows = new ArrayList<>(rows.subList(0, maxRows));
         }
 
         long elapsedMs = (System.nanoTime() - start) / 1_000_000L;

@@ -20,4 +20,9 @@ public class AgnesRepository {
         sqlGuard.validate(sql);
         return sqlExecutor.executeReadOnly(sql);
     }
+
+    public QueryResult executeScopedQuery(String sql, int maxRows) {
+        sqlGuard.validate(sql);
+        return sqlExecutor.executeReadOnly(sql, maxRows);
+    }
 }
