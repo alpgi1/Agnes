@@ -1,6 +1,8 @@
 package com.spherecast.agnes.controller;
 
 import com.spherecast.agnes.service.QueryExecutionException;
+import com.spherecast.agnes.service.claude.ClaudeApiException;
+import com.spherecast.agnes.service.claude.JsonExtractionException;
 import com.spherecast.agnes.util.InvalidSqlException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,23 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleQueryFailure(QueryExecutionException ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                 "error", "query_failed",
+                "message", ex.getMessage() == null ? "" : ex.getMessage()
+        ));
+    }
+
+    @ExceptionHandler(ClaudeApiException.class)
+    public ResponseEntity<Map<String, Object>> handleClaudeApi(ClaudeApiException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(Map.of(
+                "error", "claude_api_failed",
+                "statusCode", ex.getStatusCode(),
+                "message", ex.getMessage() == null ? "" : ex.getMessage()
+        ));
+    }
+
+    @ExceptionHandler(JsonExtractionException.class)
+    public ResponseEntity<Map<String, Object>> handleJsonExtraction(JsonExtractionException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                "error", "invalid_json_response",
                 "message", ex.getMessage() == null ? "" : ex.getMessage()
         ));
     }

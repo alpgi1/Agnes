@@ -1,11 +1,9 @@
 package com.spherecast.agnes.controller;
 
-import com.spherecast.agnes.config.ClaudeConfig;
-import com.spherecast.agnes.dto.DebugQueryRequest;
-import com.spherecast.agnes.repository.AgnesRepository;
-import com.spherecast.agnes.service.QueryResult;
-import com.spherecast.agnes.service.SchemaProvider;
-import jakarta.validation.Valid;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,8 +11,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Instant;
-import java.util.Map;
+import com.spherecast.agnes.config.ClaudeConfig;
+import com.spherecast.agnes.dto.DebugClaudeRequest;
+import com.spherecast.agnes.dto.DebugQueryRequest;
+import com.spherecast.agnes.repository.AgnesRepository;
+import com.spherecast.agnes.service.QueryResult;
+import com.spherecast.agnes.service.SchemaProvider;
+import com.spherecast.agnes.service.claude.ClaudeClient;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api")
@@ -23,13 +28,16 @@ public class AgnesController {
     private final ClaudeConfig claudeConfig;
     private final SchemaProvider schemaProvider;
     private final AgnesRepository agnesRepository;
+    private final ClaudeClient claudeClient;
 
     public AgnesController(ClaudeConfig claudeConfig,
                            SchemaProvider schemaProvider,
-                           AgnesRepository agnesRepository) {
+                           AgnesRepository agnesRepository,
+                           ClaudeClient claudeClient) {
         this.claudeConfig = claudeConfig;
         this.schemaProvider = schemaProvider;
         this.agnesRepository = agnesRepository;
+        this.claudeClient = claudeClient;
     }
 
     @GetMapping("/health")
@@ -62,5 +70,21 @@ public class AgnesController {
     @PostMapping("/debug/query")
     public QueryResult debugQuery(@Valid @RequestBody DebugQueryRequest req) {
         return agnesRepository.executeQuery(req.sql());
+    }
+
+    // dev-only: round-trips a prompt through ClaudeClient
+    @PostMapping("/debug/claude")
+    public Map<String, Object> debugClaude(@Valid @RequestBody DebugClaudeRequest req) {
+        long start = System.currentTimeMillis();
+        String response = claudeClient.ask(
+                req.system(),
+                req.prompt(),
+                req.history() != null ? req.history() : List.of(),
+                req.temperature()
+        );
+        return Map.of(
+                "response", response,
+                "durationMs", System.currentTimeMillis() - start
+        );
     }
 }
