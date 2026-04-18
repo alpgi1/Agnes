@@ -34,17 +34,17 @@ class OptimizeHandlerIT {
     }
 
     @Test
-    void genericRequestRunsAllFourWithConsolidationReal() {
+    void genericRequestRunsAllFourAllReal() {
         OptimizeResponse resp = handler.handle(
                 new OptimizeRequest("Optimiere das gesamte Portfolio.", null, null));
 
         assertThat(resp.optimizersRun())
                 .containsExactly("SUBSTITUTION", "CONSOLIDATION", "REFORMULATION", "COMPLEXITY");
-        // Only Complexity is still a stub
-        assertThat(resp.markdown()).contains("⏳");
+        // All four are now real — no more stubs
+        assertThat(resp.markdown()).contains("Substitution");
+        assertThat(resp.markdown()).contains("Consolidation");
         assertThat(resp.markdown()).contains("Reformulation");
         assertThat(resp.markdown()).contains("Complexity");
-        assertThat(resp.markdown()).contains("Consolidation");
     }
 
     @Test
@@ -146,5 +146,45 @@ class OptimizeHandlerIT {
                         assertThat(subIds).containsAll(f.derivedFrom());
                     }
                 });
+    }
+
+    @Test
+    void complexityHasNoDependency() {
+        OptimizeResponse resp = handler.handle(
+                new OptimizeRequest(
+                        "Identifiziere redundante Zutaten in den BOMs.", null, null));
+
+        // If router picks COMPLEXITY only, no hidden substitution runs
+        if (resp.optimizersRun().size() == 1
+                && resp.optimizersRun().contains("COMPLEXITY")) {
+            assertThat(resp.markdown()).doesNotContain("## Substitution");
+            assertThat(resp.markdown()).doesNotContain("## Consolidation");
+            assertThat(resp.markdown()).doesNotContain("## Reformulation");
+        }
+
+        // Every complexity finding has empty derivedFrom and a redundancyPair
+        resp.findings().stream()
+                .filter(f -> f.id() != null && f.id().toLowerCase().startsWith("cpx"))
+                .forEach(f -> {
+                    assertThat(f.derivedFrom()).isEmpty();
+                    assertThat(f.redundancyPair()).isNotNull();
+                });
+    }
+
+    @Test
+    void allFourOptimizersProduceDistinctSections() {
+        OptimizeResponse resp = handler.handle(
+                new OptimizeRequest(
+                        "Optimiere alles: Substitution, Konsolidierung, Reformulierung und Vereinfachung.",
+                        null, null));
+
+        assertThat(resp.optimizersRun()).containsExactly(
+                "SUBSTITUTION", "CONSOLIDATION", "REFORMULATION", "COMPLEXITY");
+
+        // All four markdown sections present
+        assertThat(resp.markdown()).contains("## Substitution");
+        assertThat(resp.markdown()).contains("## Consolidation");
+        assertThat(resp.markdown()).contains("## Reformulation");
+        assertThat(resp.markdown()).contains("## Complexity");
     }
 }

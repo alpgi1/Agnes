@@ -80,6 +80,16 @@ public class ResponseComposer {
             }
             sb.append("\n");
         }
+        if (f.redundancyPair() != null) {
+            Finding.RedundancyPair rp = f.redundancyPair();
+            sb.append("**Shared function:** ").append(nn(rp.sharedFunction(), "unknown")).append("\n");
+            sb.append("**Keep:** `").append(nn(rp.keepSku(), "?")).append("`\n");
+            sb.append("**Remove:** `").append(nn(rp.removeSku(), "?")).append("`\n");
+            if (rp.keepRationale() != null) {
+                sb.append("  _").append(rp.keepRationale()).append("_\n");
+            }
+            sb.append("\n");
+        }
         if (f.affectedSkus() != null && !f.affectedSkus().isEmpty()) {
             sb.append("**Affected SKUs:**\n");
             for (Finding.AffectedSku s : f.affectedSkus()) {

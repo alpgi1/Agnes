@@ -14,7 +14,8 @@ public record Finding(
         @JsonProperty("confidence") String confidence,
         @JsonProperty("compliance_relevance") ComplianceRelevance complianceRelevance,
         @JsonProperty("derived_from") List<String> derivedFrom,
-        @JsonProperty("proposed_replacement") ProposedReplacement proposedReplacement
+        @JsonProperty("proposed_replacement") ProposedReplacement proposedReplacement,
+        @JsonProperty("redundancy_pair") RedundancyPair redundancyPair
 ) {
     public record AffectedSku(
             @JsonProperty("company") String company,
@@ -27,5 +28,12 @@ public record Finding(
             @JsonProperty("ingredient_name") String ingredientName,
             @JsonProperty("short_justification") String shortJustification,
             @JsonProperty("equivalence_class") String equivalenceClass
+    ) {}
+
+    public record RedundancyPair(
+            @JsonProperty("keep_sku") String keepSku,
+            @JsonProperty("remove_sku") String removeSku,
+            @JsonProperty("shared_function") String sharedFunction,
+            @JsonProperty("keep_rationale") String keepRationale
     ) {}
 }
