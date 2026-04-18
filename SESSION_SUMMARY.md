@@ -1,20 +1,21 @@
-# Agnes — Session Summary (Phases 1–6)
+# Agnes — Session Summary (Phases 1–8)
 
 **Date:** 2026-04-18  
 **Stack:** Spring Boot 4.0.0 · Java 21 · SQLite (read-only) · Anthropic claude-sonnet-4-6  
 **Repo:** https://github.com/alpgi1/Agnes.git, branch `master`  
-**Last commit:** 2c210ca  
-**Test count:** 75 green, 0 failures (unit + integration)  
+**Last commit:** 0e18d55  
+**Test count:** 111 total, 0 failures (unit + integration)  
 
 ---
 
 ## What is Agnes?
 
 An AI-powered Supply Chain decision-support backend. It answers natural-language
-questions about a CPG sourcing database and classifies optimization requests into
-four optimizer types (Substitution, Consolidation, Reformulation, Complexity). As
-of Phase 6, the Substitution optimizer is real; the other three are wired-in
-stubs that return `⏳ pending` in the report.
+questions about a CPG sourcing database and runs optimization analysis via four
+optimizer types (Substitution, Consolidation, Reformulation, Complexity). All four
+optimizers are real (no stubs). Every finding is verified by a ComplianceChecker
+that produces verdicts (`compliant`, `uncertain`, `non-compliant`) backed by EU
+regulation context and iHerb market evidence.
 
 The database (`db.sqlite`, 180 KB, committed at repo root) contains ~61 companies,
 finished-good products, BOMs, raw-material SKUs, and supplier links. **No prices,
@@ -88,6 +89,8 @@ Raw-material SKUs encode the ingredient slug, e.g. `RM-C1-vitamin-d3-cholecalcif
 - Temperature defaults: `ask()` = 0.5, `askJson()` = 0.2
 - API key guard: throws `ClaudeApiException(-1)` if key is blank or `"PLACEHOLDER"` — before any HTTP call
 - `JsonExtractor`: handles raw JSON, fenced JSON (` ```json ... ``` `), and JSON embedded in prose
+- Read timeout: **180 s** (bumped from 60 s in Phase 8 to support large portfolio analysis)
+- Max tokens: **8192** (bumped from 4096 in Phase 8 to avoid truncated responses)
 
 **Files created:**
 - `dto/ChatMessage.java` — record with `user(…)` / `assistant(…)` factory methods
@@ -165,7 +168,7 @@ ClaudeClient(ClaudeConfig config, JsonExtractor jsonExtractor, RestClient.Builde
 `prompt` → `OptimizerRouter.route` → `ScopedDataLoader.load(scope)` → `OptimizerRegistry.get(type).run(ctx)` for each type in the router's canonical list → `ResponseComposer.compose(...)` → Markdown + `findings[]` + `complianceStatus`.
 
 **Core DTOs** (all under `handler/optimizers/`):
-- `ComplianceRelevance` — `allergen_changes`, `animal_origin_changes`, `novel_food_risk`, `label_claim_risk`, `affected_claims`, `regulatory_axes`, `notes`. Every `Finding` carries one — Phase 9's compliance checker will consume this contract.
+- `ComplianceRelevance` — `allergen_changes`, `animal_origin_changes`, `novel_food_risk`, `label_claim_risk`, `affected_claims`, `regulatory_axes`, `notes`. Every `Finding` carries one — the compliance checker consumes this contract.
 - `Finding` — `id`, `title`, `summary`, `rationale`, `affectedSkus[]`, `estimatedImpact`, `confidence`, `complianceRelevance`.
 - `OptimizerResult` — `type`, `findings`, `narrative`, `stub`, `stubReason`. Static `stub(type, reason)` factory.
 - `OptimizerContext` — `userPrompt`, `scope`, `data`, `history`, `sessionId`.
@@ -174,7 +177,6 @@ ClaudeClient(ClaudeConfig config, JsonExtractor jsonExtractor, RestClient.Builde
 **Optimizer plugin model:**
 - `Optimizer` interface — `type()` + `run(ctx)`.
 - `OptimizerRegistry` — Spring autowires all `Optimizer` beans into an `EnumMap`.
-- Four implementations: `SubstitutionOptimizer` (real, temp 0.3) + `ConsolidationOptimizer` / `ReformulationOptimizer` / `ComplexityOptimizer` (stubs that return `OptimizerResult.stub(type, "not yet implemented…")`).
 
 **Data loading (`ScopedDataLoader`):**
 - **Scope.ALL** — hardcoded denormalized query joining `Company × finished-good Product × BOM × BOM_Component × raw-material Product × Supplier_Product × Supplier` (~5000 rows on current DB).
@@ -183,25 +185,144 @@ ClaudeClient(ClaudeConfig config, JsonExtractor jsonExtractor, RestClient.Builde
 
 **Prompts** (new):
 - `compliance-awareness.txt` — 14 EU mandatory allergens, animal-origin, novel food, label claims; defines the `compliance_relevance` JSON schema that every finding must carry.
-- `scoped-data-sql.txt` — generates a denormalized SELECT for the requested scope. Columns labeled `company`, `product`, `ingredient_sku`, `supplier` (matching actual schema — no `Name` on Product, no `Country` on Supplier).
-- `optimizer-substitution.txt` — clustering prompt; JSON output schema for ≤10 findings; includes `{{COMPLIANCE_AWARENESS}}`, `{{PORTFOLIO_DATA}}`, `{{USER_PROMPT}}`.
+- `scoped-data-sql.txt` — generates a denormalized SELECT for the requested scope.
+- `optimizer-substitution.txt` — clustering prompt; JSON output schema for ≤5 findings; includes `{{COMPLIANCE_AWARENESS}}`, `{{PORTFOLIO_DATA}}`, `{{USER_PROMPT}}`.
 
-**Response shape (`ResponseComposer`):**
-- `# Optimization Report` with scope, optimizers run, data-row count, router reasoning.
-- One section per optimizer: stubs render as `⏳ _pending_ — <reason>`; real optimizers list findings with **Affected SKUs**, **Impact**, **Confidence**, and **Pre-filter flags** summarizing `compliance_relevance`.
+---
 
-**`OptimizeResponse` extended** — added `List<Finding> findings` and `String complianceStatus` (currently `"pending — ComplianceChecker lands in Phase 9"`). The existing fields (`sessionId`, `markdown`, `optimizersRun`, `scope`, `routerReasoning`, `durationMs`) are preserved.
+## Phase 7a+7b — Consolidation & Reformulation Optimizers (commit c47e177)
 
-**Schema gotchas discovered during Phase 6:**
-- `BOM_Component` uses `BOMId` (uppercase), not `BomId`.
-- `Product` has no `Name` column — only `SKU`.
-- `Supplier` has no `Country` column.
-- The initial hardcoded SQL was corrected pre-commit once `SchemaProvider` output was inspected.
+**Dependency chain architecture:**
+- Optimizers can depend on prior results: `OptimizerDependencies` defines the dependency graph.
+- `CONSOLIDATION` depends on `SUBSTITUTION` (needs substitution clusters to identify cross-company merge-purchasing).
+- `REFORMULATION` depends on `SUBSTITUTION` (same ingredient data).
+- `COMPLEXITY` has no dependencies.
+- If a dependency isn't in the router's plan, `OptimizeHandler` injects it as a **hidden** optimizer run (its findings are passed to the dependent but not shown in the report).
 
-**New tests:**
-- `service/ScopedDataLoaderIT.java` — real DB; asserts ALL scope returns rows, SQL mentions `FROM Company`, prompt string is capped.
-- `handler/optimizers/SubstitutionOptimizerIT.java` — real Claude + DB; asserts substitution run is non-stub and findings carry `complianceRelevance`. Also covers empty-data stub fallback.
-- `handler/OptimizeHandlerIT.java` — real Claude + DB; asserts the generic German prompt runs all four optimizers and renders ⏳ for the three stubs.
+**OptimizerContext extended:**
+- Added `priorResults: Map<OptimizerType, OptimizerResult>` — each optimizer receives prior results via `withPriorResult()`.
+- Fixed `EnumMap` crash: `Map.of()` has no type info for `EnumMap(Map)` constructor → uses `new EnumMap<>(OptimizerType.class)` + `putAll()`.
+
+**ConsolidationOptimizer (real):**
+- Receives substitution clusters, formats them via `ClusterFormatter`, and prompts Claude to find cross-company volume consolidation opportunities.
+- Every consolidation finding carries `derivedFrom` linking back to substitution finding IDs.
+- Prompt: `optimizer-consolidation.txt` with `{{SUBSTITUTION_CLUSTERS}}` injection block.
+
+**ReformulationOptimizer (real):**
+- Receives substitution clusters and prompts Claude to identify ingredient form changes that reduce cost, improve stability, or simplify supply chain.
+- Prompt: `optimizer-reformulation.txt` with chemistry-focused analysis instructions.
+
+**New files:**
+- `handler/optimizers/ClusterFormatter.java` — formats substitution findings into a prompt-friendly block.
+- `handler/optimizers/OptimizerDependencies.java` — static dependency graph for optimizers.
+- `src/main/resources/prompts/optimizer-consolidation.txt`
+- `src/main/resources/prompts/optimizer-reformulation.txt`
+- Tests: `ConsolidationOptimizerIT`, `ReformulationOptimizerIT`, `OptimizerDependenciesTest`
+
+---
+
+## Phase 7c — ComplexityOptimizer (commit 42da577)
+
+**ComplexityOptimizer (real):**
+- Analyzes BOM-level ingredient redundancy: finds functionally overlapping ingredients within the same product (e.g. two different vitamin E forms used as antioxidants).
+- Each finding includes `redundancyPair` (`ingredientA`, `ingredientB`, `overlapReason`, `product`) for precise identification.
+- No dependencies — works directly on portfolio data.
+- Prompt: `optimizer-complexity.txt` with detailed excipient/functional analysis rules.
+
+**Finding extended:**
+- Added `RedundancyPair` record for complexity findings.
+- `ResponseComposer` updated to render redundancy pairs in the report.
+
+At this point all four optimizers are real — no stubs remain.
+
+---
+
+## Phase 8 — ComplianceChecker + iHerb Client + EU Regulation Lookup (commit 95c2c3a + 0e18d55)
+
+**The compliance loop is now closed.** Every finding produced by any optimizer starts with `complianceStatus = "pending"` and is verified by the `ComplianceChecker` into a real verdict.
+
+### Compliance Verification Pipeline
+
+1. **`ComplianceLookupService`** — loads EU 1169/2011 regulation JSONs at startup (55 articles, 15 annexes). Provides:
+   - Tag-based article search: overlaps `relevance_tags` from findings with article tags.
+   - Allergen matching: searches Annex II (14 mandatory EU allergens) for ingredient keywords.
+   - Per-finding lookup capped at 5 results for prompt conciseness.
+   - Data: `eu_1169_2011.json` (443 lines) + `eu_1169_2011_2.json` (479 lines).
+
+2. **`IHerbClient`** — provides market evidence for supplement ingredients.
+   - 11-entry `STUB_CATALOG` covering common ingredients (Vitamin D3, Magnesium Oxide, Fish Oil, etc.).
+   - Partial keyword matching against catalog entries.
+   - Real API path stubbed out — falls back to catalog when `IHERB_RAPIDAPI_KEY` is `PLACEHOLDER`.
+
+3. **`ComplianceChecker`** — orchestrator:
+   - For each finding: looks up EU regulation context + iHerb market evidence.
+   - Packs ALL findings + evidence into a **single Claude call** (prompt: `compliance-checker.txt`).
+   - Claude returns JSON array of verdicts: `compliant`, `uncertain`, or `non-compliant`.
+   - **Dual-layer safety:** individual missing verdicts default to "uncertain"; total Claude failure wraps all findings with fallback evidence.
+   - Each verdict includes structured `EvidenceItem` list (type, source, URL, summary).
+
+4. **Integration into OptimizeHandler:**
+   - After all optimizers run, `ComplianceChecker.verify()` processes all visible findings.
+   - Results are rebuilt with `Finding.withComplianceVerdict()`.
+   - Overall compliance status aggregated: `non-compliant` > `uncertain` > `compliant`.
+
+5. **ResponseComposer updated:**
+   - Verdict icons: ✅ compliant, ⚠️ uncertain, ❌ non-compliant.
+   - Evidence hyperlinks rendered per finding.
+   - Overall compliance top-line in the report header.
+   - Backward-compatible `compose()` overload for existing tests.
+
+### Finding DTO extended
+
+```java
+public record Finding(
+    String id, String title, String summary, String rationale,
+    List<AffectedSku> affectedSkus, String estimatedImpact,
+    String confidence, ComplianceRelevance complianceRelevance,
+    List<String> derivedFrom, RedundancyPair redundancyPair,
+    String complianceStatus,          // "pending" | "compliant" | "uncertain" | "non-compliant"
+    List<EvidenceItem> complianceEvidence
+) {
+    public record EvidenceItem(String type, String source, String url, String summary) {}
+    public Finding withComplianceVerdict(String status, List<EvidenceItem> evidence) { ... }
+}
+```
+
+### Config additions (`application.yml`)
+
+```yaml
+claude:
+  max-tokens: 8192          # bumped from 4096 to avoid truncated optimizer responses
+
+compliance:
+  regulation-path: classpath:compliance/eu_1169_2011.json
+
+iherb:
+  rapidapi-key: ${IHERB_RAPIDAPI_KEY:PLACEHOLDER}
+  rapidapi-host: iherb1.p.rapidapi.com
+  base-url: https://iherb1.p.rapidapi.com
+```
+
+### New files (Phase 8)
+
+| File | Purpose |
+|------|---------|
+| `config/ComplianceConfig.java` | EU regulation JSON path config |
+| `config/ExternalApisConfig.java` | iHerb RapidAPI key/host/URL config |
+| `service/compliance/RegulationJson.java` | Jackson DTOs for regulation JSON |
+| `service/compliance/ComplianceLookupService.java` | Tag-based article search + allergen matching |
+| `service/compliance/IHerbClient.java` | Market evidence with 11-entry stub catalog |
+| `service/compliance/ComplianceChecker.java` | Orchestrator: lookup → iHerb → Claude → verdicts |
+| `controller/ComplianceDebugController.java` | `/api/debug/compliance-config` |
+| `resources/prompts/compliance-checker.txt` | Prompt with 3 injection blocks |
+| `resources/compliance/eu_1169_2011.json` | EU regulation articles (55 articles, 15 annexes) |
+| `resources/compliance/eu_1169_2011_2.json` | Additional regulation data |
+
+### Prompt tuning (Phase 8 hotfix, commit 0e18d55)
+
+- All four optimizer prompts capped to **5 findings** (was 10) + **6 affected_skus per finding** to prevent token overflow on large portfolios (2860 data rows).
+- Read timeout bumped to **180 s** (complexity optimizer needs >120 s for large portfolios).
+- Fixed `EnumMap` crash in `OptimizerContext.withPriorResult()` when `priorResults` is `Map.of()`.
 
 ---
 
@@ -212,14 +333,15 @@ ClaudeClient(ClaudeConfig config, JsonExtractor jsonExtractor, RestClient.Builde
 | GET | `/api/health` | Uptime check |
 | GET | `/api/health/config` | Model name + apiKeyPresent flag |
 | GET | `/api/debug/schema` | Full schema prompt string (plain text) |
+| GET | `/api/debug/compliance-config` | Compliance + iHerb config state |
 | POST | `/api/debug/query` | Run raw SQL (guarded, read-only) |
 | POST | `/api/debug/claude` | Raw Claude round-trip |
 | POST | `/api/knowledge` | NL question → SQL → Markdown answer |
-| POST | `/api/optimize` | Prompt → router → scoped data → optimizer pipeline → Markdown + findings |
+| POST | `/api/optimize` | Prompt → router → scoped data → optimizer pipeline → compliance → Markdown + findings |
 
 ---
 
-## Test Coverage (75 tests)
+## Test Coverage (111 tests)
 
 | Class | Type | Count |
 |-------|------|-------|
@@ -229,6 +351,9 @@ ClaudeClient(ClaudeConfig config, JsonExtractor jsonExtractor, RestClient.Builde
 | ClaudeClientTest | Unit (MockRestServiceServer) | 7 |
 | KnowledgeHandlerTest | Unit (Mockito) | 4 |
 | OptimizerRouterTest | Unit (Mockito) | 9 |
+| OptimizerDependenciesTest | Unit | 6 |
+| ComplianceLookupServiceTest | Unit (real JSON) | 8 |
+| IHerbClientTest | Unit | 5 |
 | AgnesApplicationTests | Spring context load | 1 |
 | SchemaProviderTest | IT (real DB) | 1 |
 | AgnesRepositoryIT | IT (real DB) | 3 |
@@ -237,25 +362,49 @@ ClaudeClient(ClaudeConfig config, JsonExtractor jsonExtractor, RestClient.Builde
 | KnowledgeHandlerIT | IT (real Claude + DB) | 3 |
 | OptimizerRouterIT | IT (real Claude) | 7 |
 | SubstitutionOptimizerIT | IT (real Claude + DB) | 2 |
-| OptimizeHandlerIT | IT (real Claude + DB) | 2 |
+| ConsolidationOptimizerIT | IT (real Claude + DB) | 2 |
+| ReformulationOptimizerIT | IT (real Claude + DB) | 2 |
+| ComplexityOptimizerIT | IT (real Claude + DB) | 2 |
+| OptimizeHandlerIT | IT (real Claude + DB) | 9 |
+| ComplianceCheckerIT | IT (real Claude) | 4 |
 
-16 IT tests skipped without `ANTHROPIC_API_KEY`. `@Order` + 1 s sleep between ITs avoids rate limits.
+33 IT tests require `ANTHROPIC_API_KEY`. All 78 unit tests always run.
 
 ---
 
-## What Comes Next (Phase 7+)
+## Architecture Overview
 
-**Phase 7 — ConsolidationOptimizer.** Replace the stub with a Claude call that, given the substitution clusters plus supplier links, identifies merge-purchasing opportunities across companies.
-
-**Phase 8 — Reformulation & Complexity Optimizers.** Reformulation needs chemistry/function knowledge via Claude prompting; Complexity inspects a single BOM for functionally-overlapping ingredients.
-
-**Phase 9 — ComplianceChecker.** New handler consumes every `Finding.complianceRelevance` block and produces a compliance verdict (clean / review / reject) per finding. `OptimizeResponse.complianceStatus` is wired in Phase 6 specifically to receive this.
-
-Each remaining optimizer follows the same pattern already proven in Phase 6:
-1. `ScopedDataLoader` already provides the data.
-2. A new prompt template + `askJson` call (temp 0.3).
-3. Parse into `Finding[]` with `complianceRelevance` populated.
-4. `ResponseComposer` already renders them; no handler changes needed.
+```
+User Prompt
+    │
+    ├─── /api/knowledge ──→ KnowledgeHandler
+    │       Schema → SQL (Claude) → Execute → Repair? → Answer (Claude)
+    │
+    └─── /api/optimize ──→ OptimizeHandler
+            │
+            ├── OptimizerRouter (Claude, temp 0.1)
+            │     → optimizers[], scope, reasoning
+            │
+            ├── ScopedDataLoader
+            │     → denormalized portfolio data
+            │
+            ├── OptimizerDependencies
+            │     → inject hidden deps (e.g. SUBSTITUTION for CONSOLIDATION)
+            │
+            ├── Optimizer Pipeline (sequential, canonical order)
+            │     ├── SubstitutionOptimizer  → naming clusters
+            │     ├── ConsolidationOptimizer → cross-company volume merges
+            │     ├── ReformulationOptimizer → ingredient form changes
+            │     └── ComplexityOptimizer    → BOM redundancy pairs
+            │
+            ├── ComplianceChecker (single Claude call)
+            │     ├── ComplianceLookupService → EU 1169/2011 articles
+            │     ├── IHerbClient → market evidence (stub catalog)
+            │     └── Claude → verdicts + evidence per finding
+            │
+            └── ResponseComposer → Markdown report with
+                  ✅/⚠️/❌ verdicts, evidence links, overall status
+```
 
 ---
 
@@ -265,5 +414,7 @@ Each remaining optimizer follows the same pattern already proven in Phase 6:
 - Maven must be invoked via full path — macOS: `~/.m2/wrapper/dists/apache-maven-3.9.14/db91789b/bin/mvn`; Windows/IntelliJ: `/c/Program Files/JetBrains/IntelliJ IDEA 2025.2.3/plugins/maven/lib/maven3/bin/mvn.cmd`.
 - Jackson 3 is in use — always import from `tools.jackson.databind.*` for runtime types; `com.fasterxml.jackson.annotation.*` for annotations.
 - `.env` file holds the API key (gitignored) — never commit it.
-- Every finding emitted by any optimizer **must** carry a `compliance_relevance` object (even empty) — Phase 9 assumes the field is always present.
+- Every finding emitted by any optimizer **must** carry a `compliance_relevance` object (even empty) — the compliance checker assumes the field is always present.
 - `IMPLEMENTATION_PLAN.md` was referenced in early phase prompts but was never in the repo — each phase prompt was self-contained.
+- All optimizer prompts are capped at **5 findings** + **6 affected_skus per finding** to stay within the 8192 token budget.
+- `EnumMap<>(Map)` constructor fails on empty `Map.of()` — always use `new EnumMap<>(OptimizerType.class)` + `putAll()`.
