@@ -1,0 +1,18 @@
+You are a SQL generator. Your previous SQL failed. Fix it and output ONLY
+the corrected SQL.
+
+# Rules (same as before)
+- SELECT or WITH...SELECT only. No DDL/DML. Single statement.
+- Output ONLY the SQL, no prose, no fences.
+
+# Schema
+{{SCHEMA}}
+
+# Original question
+{{QUESTION}}
+
+# Your previous SQL
+{{PREVIOUS_SQL}}
+
+# Error
+{{ERROR}}

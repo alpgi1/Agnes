@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.spherecast.agnes.config.ClaudeConfig;
 import com.spherecast.agnes.dto.DebugClaudeRequest;
 import com.spherecast.agnes.dto.DebugQueryRequest;
+import com.spherecast.agnes.dto.KnowledgeRequest;
+import com.spherecast.agnes.dto.KnowledgeResponse;
+import com.spherecast.agnes.handler.KnowledgeHandler;
 import com.spherecast.agnes.repository.AgnesRepository;
 import com.spherecast.agnes.service.QueryResult;
 import com.spherecast.agnes.service.SchemaProvider;
@@ -29,15 +32,18 @@ public class AgnesController {
     private final SchemaProvider schemaProvider;
     private final AgnesRepository agnesRepository;
     private final ClaudeClient claudeClient;
+    private final KnowledgeHandler knowledgeHandler;
 
     public AgnesController(ClaudeConfig claudeConfig,
                            SchemaProvider schemaProvider,
                            AgnesRepository agnesRepository,
-                           ClaudeClient claudeClient) {
+                           ClaudeClient claudeClient,
+                           KnowledgeHandler knowledgeHandler) {
         this.claudeConfig = claudeConfig;
         this.schemaProvider = schemaProvider;
         this.agnesRepository = agnesRepository;
         this.claudeClient = claudeClient;
+        this.knowledgeHandler = knowledgeHandler;
     }
 
     @GetMapping("/health")
@@ -70,6 +76,11 @@ public class AgnesController {
     @PostMapping("/debug/query")
     public QueryResult debugQuery(@Valid @RequestBody DebugQueryRequest req) {
         return agnesRepository.executeQuery(req.sql());
+    }
+
+    @PostMapping("/knowledge")
+    public KnowledgeResponse knowledge(@Valid @RequestBody KnowledgeRequest req) {
+        return knowledgeHandler.handle(req);
     }
 
     // dev-only: round-trips a prompt through ClaudeClient
