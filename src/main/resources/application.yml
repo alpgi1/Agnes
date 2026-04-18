@@ -1,0 +1,20 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    driver-class-name: org.sqlite.JDBC
+    url: jdbc:sqlite:./db.sqlite
+  application:
+    name: agnes
+
+claude:
+  api-key: ${ANTHROPIC_API_KEY:PLACEHOLDER}
+  model: claude-sonnet-4-6
+  max-tokens: 4096
+  base-url: https://api.anthropic.com
+  anthropic-version: "2023-06-01"
+
+logging:
+  level:
+    com.spherecast.agnes: DEBUG
