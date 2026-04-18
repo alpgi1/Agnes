@@ -36,17 +36,20 @@ public class ResponseComposer {
         sb.append("\n---\n\n");
 
         for (OptimizerResult result : results) {
-            sb.append("## ").append(titleFor(result.type())).append("\n\n");
-            if (result.stub()) {
-                sb.append("⏳ _pending_ — ").append(result.stubReason()).append("\n\n");
+            sb.append("## ").append(titleFor(result.optimizer())).append("\n\n");
+            if (result.skipped()) {
+                sb.append("⏳ _pending_ — ").append(result.skipReason()).append("\n\n");
                 continue;
             }
-            if (result.narrative() != null && !result.narrative().isBlank()) {
-                sb.append(result.narrative()).append("\n\n");
+            if (result.narrativeSummary() != null && !result.narrativeSummary().isBlank()) {
+                sb.append(result.narrativeSummary()).append("\n\n");
             }
             List<Finding> findings = result.findings() == null ? List.of() : result.findings();
             if (findings.isEmpty()) {
-                sb.append("_No findings._\n\n");
+                // Don't add "No findings" if the narrative already explained the absence
+                if (result.narrativeSummary() == null || result.narrativeSummary().isBlank()) {
+                    sb.append("_No findings._\n\n");
+                }
                 continue;
             }
             for (Finding f : findings) {
@@ -61,6 +64,22 @@ public class ResponseComposer {
                 .append(" — ").append(nn(f.title(), "(untitled)")).append("\n");
         if (f.summary() != null) sb.append(f.summary()).append("\n\n");
         if (f.rationale() != null) sb.append("**Why:** ").append(f.rationale()).append("\n\n");
+        if (f.derivedFrom() != null && !f.derivedFrom().isEmpty()) {
+            sb.append("**Derived from:** Substitution finding ")
+                    .append(String.join(", ", f.derivedFrom())).append("\n\n");
+        }
+        if (f.proposedReplacement() != null) {
+            Finding.ProposedReplacement pr = f.proposedReplacement();
+            sb.append("**Proposed swap:** → **").append(pr.ingredientName()).append("**");
+            if (pr.equivalenceClass() != null) {
+                sb.append(" (").append(pr.equivalenceClass()).append(")");
+            }
+            sb.append("\n");
+            if (pr.shortJustification() != null) {
+                sb.append("  _").append(pr.shortJustification()).append("_\n");
+            }
+            sb.append("\n");
+        }
         if (f.affectedSkus() != null && !f.affectedSkus().isEmpty()) {
             sb.append("**Affected SKUs:**\n");
             for (Finding.AffectedSku s : f.affectedSkus()) {
@@ -95,8 +114,18 @@ public class ResponseComposer {
                     ? "" : " (" + String.join(", ", cr.affectedClaims()) + ")";
             flags.add("label-claim-risk" + claims);
         }
+        if (Boolean.TRUE.equals(cr.changesIngredientChemistry())) {
+            flags.add("changes-ingredient-chemistry");
+        }
         if (!flags.isEmpty()) {
             sb.append("**Pre-filter flags:** ").append(String.join("; ", flags)).append("\n\n");
+        }
+        if (cr.preFilterFlags() != null && !cr.preFilterFlags().isEmpty()) {
+            sb.append("**Compliance notes:**\n");
+            for (String flag : cr.preFilterFlags()) {
+                sb.append("- ").append(flag).append("\n");
+            }
+            sb.append("\n");
         }
     }
 

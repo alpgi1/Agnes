@@ -12,6 +12,6 @@ public class ComplexityOptimizer implements Optimizer {
 
     @Override
     public OptimizerResult run(OptimizerContext ctx) {
-        return OptimizerResult.stub(type(), "not yet implemented — planned for Phase 8");
+        return OptimizerResult.stub(type(), "not yet implemented — planned for Phase 7c");
     }
 }

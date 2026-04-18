@@ -115,6 +115,12 @@ public class ClaudeClient {
         return jsonExtractor.extractJson(text);
     }
 
+    public JsonNode askJson(String systemPrompt, String userPrompt,
+                            List<ChatMessage> history, double temperature) {
+        String text = ask(withJsonInstruction(systemPrompt), userPrompt, history, temperature);
+        return jsonExtractor.extractJson(text);
+    }
+
     public <T> T askJson(String systemPrompt, String userPrompt, Class<T> type) {
         String text = ask(withJsonInstruction(systemPrompt), userPrompt, List.of(), JSON_TEMPERATURE);
         return jsonExtractor.extractJson(text, type);

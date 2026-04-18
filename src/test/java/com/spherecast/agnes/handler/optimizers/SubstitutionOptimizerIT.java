@@ -24,31 +24,32 @@ class SubstitutionOptimizerIT {
     @Test
     void runsAgainstAllPortfolioAndReturnsFindings() {
         ScopedData data = scopedDataLoader.load(Scope.all(), "find substitution clusters");
-        OptimizerContext ctx = new OptimizerContext(
+        OptimizerContext ctx = OptimizerContext.initial(
                 "Find substitution candidates across the portfolio.",
                 Scope.all(), data, List.of(), "test-session");
 
         OptimizerResult result = optimizer.run(ctx);
 
-        assertThat(result.type()).isEqualTo(OptimizerType.SUBSTITUTION);
-        assertThat(result.stub()).isFalse();
-        assertThat(result.narrative()).isNotBlank();
+        assertThat(result.optimizer()).isEqualTo(OptimizerType.SUBSTITUTION);
+        assertThat(result.skipped()).isFalse();
+        assertThat(result.narrativeSummary()).isNotBlank();
         if (!result.findings().isEmpty()) {
             Finding first = result.findings().get(0);
             assertThat(first.complianceRelevance()).isNotNull();
             assertThat(first.id()).isNotBlank();
+            assertThat(first.derivedFrom()).isNotNull();
         }
     }
 
     @Test
     void emptyDataReturnsStub() {
         ScopedData empty = new ScopedData(List.of(), 0, false, "-", "(empty)");
-        OptimizerContext ctx = new OptimizerContext(
+        OptimizerContext ctx = OptimizerContext.initial(
                 "anything", Scope.all(), empty, List.of(), "test-session");
 
         OptimizerResult result = optimizer.run(ctx);
 
-        assertThat(result.stub()).isTrue();
-        assertThat(result.stubReason()).contains("no portfolio data");
+        assertThat(result.skipped()).isTrue();
+        assertThat(result.skipReason()).contains("no portfolio data");
     }
 }

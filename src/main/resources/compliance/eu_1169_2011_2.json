@@ -1,0 +1,479 @@
+{
+  "regulation": {
+    "id": "EU 1169/2011",
+    "title": "REGULATION (EU) No 1169/2011 OF THE EUROPEAN PARLIAMENT AND OF THE COUNCIL of 25 October 2011 on the provision of food information to consumers",
+    "consolidated_version": "01.01.2018",
+    "source": "EUR-Lex"
+  },
+  "articles": [
+    {
+      "number": 49,
+      "title": "Amendments to Regulation (EC) No 1924/2006",
+      "chapter": null,
+      "section": null,
+      "summary": "Amends Regulation (EC) No 1924/2006 to mandate nutrition labeling for products making health or nutrition claims. It aligns the required nutritional information with the standards set in this Regulation.",
+      "full_text": "The first and second paragraphs of Article 7 of Regulation (EC) No 1924/2006 are replaced by the following:\n'Nutrition labelling of products on which a nutrition and/or health claim is made shall be mandatory, with the exception of generic advertising. The information to be provided shall consist of that specified in Article 30(1) of Regulation (EU) No 1169/2011 of the European Parliament and of the Council of 25 October 2011 on the provision of food information to consumers (*).\nWhere a nutrition and/or health claim is made for a nutrient referred to in Article 30(2) of Regulation (EU) No 1169/2011 the amount of that nutrient shall be declared in accordance with Articles 31 to 34 of that Regulation.\nThe amount(s) of the substance(s) to which a nutrition or health claim relates that does not appear in the nutrition labelling shall be stated in the same field of vision as the nutrition labelling and be expressed in accordance with Articles 31, 32 and 33 of Regulation (EU) No 1169/2011. The units of measurement used to express the amount of the substance shall be appropriate for the individual substances concerned.",
+      "relevance_tags": [
+        "claims",
+        "nutrition",
+        "labelling",
+        "mandatory_info"
+      ]
+    },
+    {
+      "number": 50,
+      "title": "Amendments to Regulation (EC) No 1925/2006",
+      "chapter": null,
+      "section": null,
+      "summary": "Amends Regulation (EC) No 1925/2006 to make nutrition labeling compulsory for foods with added vitamins and minerals. It requires stating the total amounts of added vitamins and minerals alongside standard nutritional data.",
+      "full_text": "Paragraph 3 of Article 7 of Regulation (EC) No 1925/2006 is replaced by the following:\n3. Nutrition labelling of products to which vitamins and minerals have been added and which are covered by this Regulation shall be compulsory. The information to be provided shall consist of that specified in Article 30(1) of Regulation (EU) No 1169/2011 of the European Parliament and of the Council of 25 October 2011 on the provision of food information to consumers (*2) and of the total amounts present of the vitamins and minerals when added to the food.",
+      "relevance_tags": [
+        "nutrition",
+        "labelling",
+        "mandatory_info"
+      ]
+    },
+    {
+      "number": 51,
+      "title": "Exercise of the delegation",
+      "chapter": null,
+      "section": null,
+      "summary": "Confers the power to adopt delegated acts on the Commission for a period of 5 years. It establishes the conditions, reporting requirements, and revocation procedures for this delegated authority.",
+      "full_text": "1. The power to adopt delegated acts is conferred on the Commission subject to the conditions laid down in this Article.\n2. The power to adopt delegated acts referred to in Article 9(3), Article 10(2), Article 12(3), Article 13(4), Article 18(5), Article 19(2), Article 21(2), Article 23(2), Article 30(6), Article 31(2), Article 36(4) and Article 46 shall be conferred on the Commission for a period of 5 years after 12 December 2011. The Commission shall draw up a report in respect of the delegation of power not later than 9 months before the end of the 5-year period. The delegation of power shall be tacitly extended for periods of an identical duration, unless the European Parliament or the Council opposes such extension not later than 3 months before the end of each period.\n3. The delegation of power referred to in Article 9(3), Article 10(2), Article 12(3), Article 13(4), Article 18(5), Article 19(2), Article 21(2), Article 23(2), Article 30(6), Article 31(2), Article 36(4) and Article 46 may be revoked at any time by the European Parliament or by the Council. A decision to revoke shall put an end to the delegation of the power specified in that decision. It shall take effect the day following the publication of the decision in the Official Journal of the European Union or on a later date specified therein. It shall not affect the validity of any delegated acts already in force.\n4. As soon as it adopts a delegated act, the Commission shall notify it simultaneously to the European Parliament and to the Council.\n5. A delegated act adopted pursuant to Article 9(3), Article 10(2), Article 12(3), Article 13(4), Article 18(5), Article 19(2), Article 21(2), Article 23(2), Article 30(6), Article 31(2), Article 36(4) and Article 46 shall enter into force only if no objection has been expressed either by the European Parliament or the Council within a period of 2 months of notification of that act to the European Parliament and the Council or if, before the expiry of that period, the European Parliament and the Council have both informed the Commission that they will not object. That period shall be extended by 2 months at the initiative of the European Parliament or of the Council.",
+      "relevance_tags": [
+        "labelling"
+      ]
+    },
+    {
+      "number": 52,
+      "title": "Urgency procedure",
+      "chapter": null,
+      "section": null,
+      "summary": "Outlines a fast-track process for delegated acts to enter into force without delay under urgent circumstances. The act can still be repealed if the European Parliament or Council objects.",
+      "full_text": "1. Delegated acts adopted under this Article shall enter into force without delay and shall apply as long as no objection is expressed in accordance with paragraph 2. The notification of a delegated act to the European Parliament and to the Council shall state the reasons for the use of the urgency procedure.\n2. Either the European Parliament or the Council may object to a delegated act in accordance with the procedure referred to in Article 51(5). In such a case, the Commission shall repeal the act without delay following the notification of the decision to object by the European Parliament or by the Council.",
+      "relevance_tags": [
+        "labelling"
+      ]
+    },
+    {
+      "number": 53,
+      "title": "Repeal",
+      "chapter": null,
+      "section": null,
+      "summary": "Repeals several older directives and regulations effective 13 December 2014. It specifies that references to these repealed acts must now be construed as references to this Regulation.",
+      "full_text": "1. Directives 87/250/EEC, 90/496/EEC, 1999/10/EC, 2000/13/EC, 2002/67/EC and 2008/5/EC and Regulation (EC) No 608/2004 are repealed as from 13 December 2014.\n2. References to the repealed acts shall be construed as references to this Regulation.",
+      "relevance_tags": [
+        "scope",
+        "labelling"
+      ]
+    },
+    {
+      "number": 54,
+      "title": "Transitional measures",
+      "chapter": null,
+      "section": null,
+      "summary": "Sets out transitional periods allowing existing non-compliant products placed on the market or labeled prior to specific dates to be sold until stocks run out. Permits early voluntary adoption of the new nutrition rules.",
+      "full_text": "1. Foods placed on the market or labelled prior to 13 December 2014 which do not comply with the requirements of this Regulation may be marketed until the stocks of the foods are exhausted.\nFoods placed on the market or labelled prior to 13 December 2016 which do not comply with the requirement laid down in point (l) of Article 9(1) may be marketed until the stocks of the foods are exhausted.\nFoods placed on the market or labelled prior to 1 January 2014 which do not comply with the requirements laid down in Part B of Annex VI may be marketed until the stocks of the foods are exhausted.\n2. Between 13 December 2014 and 13 December 2016, where the nutrition declaration is provided on a voluntary basis, it shall comply with Articles 30 to 35.\n3. Notwithstanding Directive 90/496/EEC, Article 7 of Regulation (EC) No 1924/2006 and Article 7(3) of Regulation (EC) No 1925/2006, foods labelled in accordance with Articles 30 to 35 of this Regulation may be placed on the market before 13 December 2014.\nNotwithstanding Commission Regulation (EC) No 1162/2009 of 30 November 2009 laying down transitional measures for the implementation of Regulations (EC) No 853/2004, (EC) No 854/2004 and (EC) No 882/2004 of the European Parliament and of the Council (14), foods labelled in accordance with Part B of Annex VI to this Regulation may be placed on the market before 1 January 2014.",
+      "relevance_tags": [
+        "labelling",
+        "nutrition",
+        "mandatory_info"
+      ]
+    },
+    {
+      "number": 55,
+      "title": "Entry into force and date of application",
+      "chapter": null,
+      "section": null,
+      "summary": "Specifies when the Regulation enters into force and dates of application for its various parts. Establishes the core application date as 13 December 2014.",
+      "full_text": "This Regulation shall enter into force on the 20th day following its publication in the Official Journal of the European Union.\nIt shall apply from 13 December 2014, with the exception of point (l) of Article 9(1), which shall apply from 13 December 2016, and Part B of Annex VI, which shall apply from 1 January 2014.\nThis Regulation shall be binding in its entirety and directly applicable in all Member States.",
+      "relevance_tags": [
+        "scope"
+      ]
+    }
+  ],
+  "annexes": [
+    {
+      "id": "Annex I",
+      "title": "SPECIFIC DEFINITIONS",
+      "type": "generic",
+      "content": "As referred to in Article 2(4)\n1. 'nutrition declaration' or 'nutrition labelling' means information stating the: (a) energy value; or (b) energy value and one or more of the following nutrients only: fat (saturates, mono-unsaturates, polyunsaturates), carbohydrate (sugars, polyols, starch), salt, fibre, protein, any of the vitamins or minerals listed in point 1 of Part A of Annex XIII, and present in significant amounts as defined in point 2 of Part A of Annex XIII.\n2. 'fat' means total lipids, and includes phospholipids;\n3. 'saturates' means fatty acids without double bond;\n4. 'trans fat' means fatty acids with at least one non-conjugated (namely interrupted by at least one methylene group) carbon-carbon double bond in the trans configuration;\n5. 'mono-unsaturates' means fatty acids with one cis double bond;\n6. 'polyunsaturates' means fatty acids with two or more cis, cis-methylene interrupted double bonds;\n7. 'carbohydrate' means any carbohydrate which is metabolised by humans, and includes polyols;\n8. 'sugars' means all monosaccharides and disaccharides present in food, but excludes polyols;\n9. 'polyols' means alcohols containing more than two hydroxyl groups;\n10. 'protein' means the protein content calculated using the formula: protein = total Kjeldahl nitrogen × 6,25;\n11. 'salt' means the salt equivalent content calculated using the formula: salt = sodium × 2,5;\n12. 'fibre' means carbohydrate polymers with three or more monomeric units, which are neither digested nor absorbed in the human small intestine and belong to the following categories: edible carbohydrate polymers naturally occurring in the food as consumed, edible carbohydrate polymers which have been obtained from food raw material by physical, enzymatic or chemical means and which have a beneficial physiological effect demonstrated by generally accepted scientific evidence, edible synthetic carbohydrate polymers which have a beneficial physiological effect demonstrated by generally accepted scientific evidence.\n13. 'average value' means the value which best represents the amount of the nutrient which a given food contains, and reflects allowances for seasonal variability, patterns of consumption and other factors which may cause the actual value to vary."
+    },
+    {
+      "id": "Annex II",
+      "title": "SUBSTANCES OR PRODUCTS CAUSING ALLERGIES OR INTOLERANCES",
+      "type": "allergen_list",
+      "items": [
+        {
+          "number": 1,
+          "name": "Cereals containing gluten",
+          "details": "Cereals containing gluten, namely: wheat (such as spelt and khorasan wheat), rye, barley, oats or their hybridised strains, and products thereof, except: (a) wheat based glucose syrups including dextrose (15); (b) wheat based maltodextrins (15); (c) glucose syrups based on barley; (d) cereals used for making alcoholic distillates including ethyl alcohol of agricultural origin;",
+          "examples": [
+            "wheat",
+            "spelt",
+            "khorasan wheat",
+            "rye",
+            "barley",
+            "oats",
+            "hybridised strains"
+          ]
+        },
+        {
+          "number": 2,
+          "name": "Crustaceans and products thereof",
+          "details": "Crustaceans and products thereof;",
+          "examples": [
+            "Crustaceans"
+          ]
+        },
+        {
+          "number": 3,
+          "name": "Eggs and products thereof",
+          "details": "Eggs and products thereof;",
+          "examples": [
+            "Eggs"
+          ]
+        },
+        {
+          "number": 4,
+          "name": "Fish and products thereof",
+          "details": "Fish and products thereof, except: (a) fish gelatine used as carrier for vitamin or carotenoid preparations; (b) fish gelatine or Isinglass used as fining agent in beer and wine;",
+          "examples": [
+            "Fish"
+          ]
+        },
+        {
+          "number": 5,
+          "name": "Peanuts and products thereof",
+          "details": "Peanuts and products thereof;",
+          "examples": [
+            "Peanuts"
+          ]
+        },
+        {
+          "number": 6,
+          "name": "Soybeans and products thereof",
+          "details": "Soybeans and products thereof, except: (a) fully refined soybean oil and fat (15); (b) natural mixed tocopherols (E306), natural D-alpha tocopherol, natural D-alpha tocopherol acetate, and natural D-alpha tocopherol succinate from soybean sources; (c) vegetable oils derived phytosterols and phytosterol esters from soybean sources; (d) plant stanol ester produced from vegetable oil sterols from soybean sources;",
+          "examples": [
+            "Soybeans"
+          ]
+        },
+        {
+          "number": 7,
+          "name": "Milk and products thereof (including lactose)",
+          "details": "Milk and products thereof (including lactose), except: (a) whey used for making alcoholic distillates including ethyl alcohol of agricultural origin; (b) lactitol;",
+          "examples": [
+            "Milk",
+            "lactose"
+          ]
+        },
+        {
+          "number": 8,
+          "name": "Nuts",
+          "details": "Nuts, namely: almonds (Amygdalus communis L.), hazelnuts (Corylus avellana), walnuts (Juglans regia), cashews (Anacardium occidentale), pecan nuts (Carya illinoinensis (Wangenh.) K. Koch), Brazil nuts (Bertholletia excelsa), pistachio nuts (Pistacia vera), macadamia or Queensland nuts (Macadamia ternifolia), and products thereof, except for nuts used for making alcoholic distillates including ethyl alcohol of agricultural origin;",
+          "examples": [
+            "almonds",
+            "hazelnuts",
+            "walnuts",
+            "cashews",
+            "pecan nuts",
+            "Brazil nuts",
+            "pistachio nuts",
+            "macadamia nuts",
+            "Queensland nuts"
+          ]
+        },
+        {
+          "number": 9,
+          "name": "Celery and products thereof",
+          "details": "Celery and products thereof;",
+          "examples": [
+            "Celery"
+          ]
+        },
+        {
+          "number": 10,
+          "name": "Mustard and products thereof",
+          "details": "Mustard and products thereof;",
+          "examples": [
+            "Mustard"
+          ]
+        },
+        {
+          "number": 11,
+          "name": "Sesame seeds and products thereof",
+          "details": "Sesame seeds and products thereof;",
+          "examples": [
+            "Sesame seeds"
+          ]
+        },
+        {
+          "number": 12,
+          "name": "Sulphur dioxide and sulphites",
+          "details": "Sulphur dioxide and sulphites at concentrations of more than 10 mg/kg or 10 mg/litre in terms of the total SO2 which are to be calculated for products as proposed ready for consumption or as reconstituted according to the instructions of the manufacturers;",
+          "examples": [
+            "Sulphur dioxide",
+            "sulphites"
+          ]
+        },
+        {
+          "number": 13,
+          "name": "Lupin and products thereof",
+          "details": "Lupin and products thereof;",
+          "examples": [
+            "Lupin"
+          ]
+        },
+        {
+          "number": 14,
+          "name": "Molluscs and products thereof",
+          "details": "Molluscs and products thereof.",
+          "examples": [
+            "Molluscs"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "Annex III",
+      "title": "FOODS FOR WHICH THE LABELLING MUST INCLUDE ONE OR MORE ADDITIONAL PARTICULARS",
+      "type": "generic",
+      "content": "TYPE OR CATEGORY OF FOOD | PARTICULARS\n1. Foods packaged in certain gases\n1.1. Foods whose durability has been extended by means of packaging gases authorised pursuant to Regulation (EC) No 1333/2008. | 'packaged in a protective atmosphere'.\n2. Foods containing sweeteners\n2.1. Foods containing a sweetener or sweeteners authorised pursuant to Regulation (EC) No 1333/2008. | 'with sweetener(s)' this statement shall accompany the name of the food.\n2.2. Foods containing both an added sugar or sugars and a sweetener or sweeteners authorised pursuant to Regulation (EC) No 1333/2008. | 'with sugar(s) and sweetener(s)' this statement shall accompany the name of the food.\n2.3. Foods containing aspartame/aspartame-acesulfame salt authorised pursuant to Regulation (EC) No 1333/2008. | 'contains aspartame (a source of phenylalanine)' shall appear on the label in cases where aspartame/aspartame-acesulfame salt is designated in the list of ingredients only by reference to the E number. 'contains a source of phenylalanine' shall appear on the label in cases where aspartame/aspartame-acesulfame salt is designated in the list of ingredients by its specific name.\n2.4. Foods containing more than 10% added polyols authorised pursuant to Regulation (EC) No 1333/2008. | 'excessive consumption may produce laxative effects'.\n3. Foods containing glycyrrhizinic acid or its ammonium salt\n3.1. Confectionery or beverages containing glycyrrhizinic acid or its ammonium salt due to the addition of the substance(s) as such or the liquorice plant Glycyrrhiza glabra, at concentration of 100 mg/kg or 10 mg/l or above. | 'contains liquorice' shall be added immediately after the list of ingredients, unless the term 'liquorice' is already included in the list of ingredients or in the name of the food. In the absence of a list of ingredients, the statement shall accompany the name of the food.\n3.2. Confectionary containing glycyrrhizinic acid or its ammonium salt due to the addition of the substance(s) as such or the liquorice plant Glycyrrhiza glabra at concentrations of 4 g/kg or above. | 'contains liquorice - people suffering from hypertension should avoid excessive consumption' shall be added immediately after the list of ingredients. In the absence of a list of ingredients, the statement shall accompany the name of the food.\n3.3. Beverages containing glycyrrhizinic acid or its ammonium salt due to the addition of the substance(s) as such or the liquorice plant Glycyrrhiza glabra at concentrations of 50 mg/l or above, or of 300 mg/l or above in the case of beverages containing more than 1,2% by volume of alcohol (1) | 'contains liquorice - people suffering from hypertension should avoid excessive consumption' shall be added immediately after the list of ingredients. In the absence of a list of ingredients, the statement shall accompany the name of the food.\n4. Beverages with high caffeine content or foods with added caffeine\n4.1. Beverages, with the exception of those based on coffee, tea or coffee or tea extract where the name of the food includes the term 'coffee' or 'tea', which: are intended for consumption without modification and contain caffeine, from whatever source, in a proportion in excess of 150 mg/l, or, are in concentrated or dried form and after reconstitution contain caffeine, from whatever source, in a proportion in excess of 150 mg/l. | 'High caffeine content. Not recommended for children or pregnant or breast-feeding women' in the same field of vision as the name of the beverage, followed by a reference in brackets and in accordance with Article 13(1) of this Regulation to the caffeine content expressed in mg per 100 ml.\n4.2. Foods other than beverages, where caffeine is added with a physiological purpose. | 'Contains caffeine. Not recommended for children or pregnant women' in the same field of vision as the name of the food, followed by a reference in brackets and in accordance with Article 13(1) of this Regulation to the caffeine content expressed in mg per 100 g/ml. In the case of food supplements, the caffeine content shall be expressed per portion as recommended for daily consumption on the labelling.\n5. Foods with added phytosterols, phytosterol esters, phytostanols or phytostanol esters\n5.1. Foods or food ingredients with added phytosterols, phytosterol esters, phytostanols or phytostanol esters. | (1) 'with added plant sterols' or 'with added plant stanols' in the same field of vision as the name of the food; (2) the amount of added phytosterols, phytosterol esters, phytostanols or phytostanol esters content (expressed in % or as g of free plant sterols/plant stanols per 100 g or 100 ml of the food) shall be stated in the list of ingredients; (3) a statement that the product is not intended for people who do not need to control their blood cholesterol level; (4) a statement that patients on cholesterol lowering medication should only consume the product under medical supervision; (5) an easily visible statement that the food may not be nutritionally appropriate for pregnant or breast-feeding women and children under the age of 5 years; (6) advice that the food is to be used as part of a balanced and varied diet, including regular consumption of fruit and vegetables to help maintain carotenoid levels; (7) in the same field of vision as the statement required under point (3) above, a statement that the consumption of more than 3 g/day of added plant sterols/plant stanols should be avoided; (8) a definition of a portion of the food or food ingredient concerned (preferably in g or ml) with the amount of the plant sterol/plant stanol that each portion contains.\n6. Frozen meat, frozen meat preparations and frozen unprocessed fishery products\n6.1. Frozen meat, frozen meat preparations and frozen unprocessed fishery products. | the date of freezing or the date of first freezing in cases where the product has been frozen more than once, in accordance with point (3) of Annex X.\n(1) The level shall apply to the products as proposed ready for consumption or as reconstituted according to the instructions of the manufacturers."
+    },
+    {
+      "id": "Annex IV",
+      "title": "DEFINITION OF X-HEIGHT",
+      "type": "generic",
+      "content": "X-HEIGHT\nAppendix Legend\n1 Ascender line\n2 Cap line\n3 Mean line\n4 Baseline\n5 Descender line\n6 x-height\n7 Font size"
+    },
+    {
+      "id": "Annex V",
+      "title": "FOODS WHICH ARE EXEMPTED FROM THE REQUIREMENT OF THE MANDATORY NUTRITION DECLARATION",
+      "type": "generic",
+      "content": "1. Unprocessed products that comprise a single ingredient or category of ingredients;\n2. Processed products which the only processing they have been subjected to is maturing and that comprise a single ingredient or category of ingredients;\n3. Waters intended for human consumption, including those where the only added ingredients are carbon dioxide and/or flavourings;\n4. A herb, a spice or mixtures thereof;\n5. Salt and salt substitutes;\n6. Table top sweeteners;\n7. Products covered by Directive 1999/4/EC of the European Parliament and of the Council of 22 February 1999 relating to coffee extracts and chicory extracts (16), whole or milled coffee beans and whole or milled decaffeinated coffee beans;\n8. Herbal and fruit infusions, tea, decaffeinated tea, instant or soluble tea or tea extract, decaffeinated instant or soluble tea or tea extract, which do not contain other added ingredients than flavourings which do not modify the nutritional value of the tea;\n9. Fermented vinegars and substitutes for vinegar, including those where the only added ingredients are flavourings;\n10. Flavourings;\n11. Food additives;\n12. Processing aids;\n13. Food enzymes;\n14. Gelatine;\n15. Jam setting compounds;\n16. Yeast;\n17. Chewing-gums;\n18. Food in packaging or containers the largest surface of which has an area of less than 25 cm2;\n19. Food, including handcrafted food, directly supplied by the manufacturer of small quantities of products to the final consumer or to local retail establishments directly supplying the final consumer."
+    },
+    {
+      "id": "Annex VI",
+      "title": "NAME OF THE FOOD AND SPECIFIC ACCOMPANYING PARTICULARS",
+      "type": "generic",
+      "content": "PART A MANDATORY PARTICULARS ACCOMPANYING THE NAME OF THE FOOD\n1. The name of the food shall include or be accompanied by particulars as to the physical condition of the food or the specific treatment which it has undergone (for example, powdered, refrozen, freeze-dried, quick-frozen, concentrated, smoked) in all cases where omission of such information could mislead the purchaser.\n2. In the case of foods that have been frozen before sale and which are sold defrosted, the name of the food shall be accompanied by the designation 'defrosted'. This requirement shall not apply to the following: (a) ingredients present in the final product; (b) foods for which freezing is a technologically necessary step of the production process; (c) foods for which the defrosting has no negative impact on the safety or quality of the food. This point shall apply without prejudice to point 1.\n3. Foods treated with ionising radiation shall bear one of the following indications: 'irradiated' or 'treated with ionising radiation', and other indications as stated in Directive 1999/2/EC of the European Parliament and of the Council of 22 February 1999 on the approximation of the laws of the Member States concerning foods and food ingredients treated with ionising radiation (17).\n4. In the case of foods in which a component or ingredient that consumers expect to be normally used or naturally present has been substituted with a different component or ingredient, the labelling shall bear in addition to the list of ingredients a clear indication of the component or the ingredient that has been used for the partial or whole substitution: (a) in close proximity to the name of the product; and (b) using a font size which has an x-height of at least 75% of the x-height of the name of the product and which is not smaller than the minimum font size required in Article 13(2) of this Regulation.\n5. In the case of meat products, meat preparations and fishery products containing added proteins as such, including hydrolysed proteins, of a different animal origin, the name of the food shall bear an indication of the presence of those proteins and of their origin.\n6. In the case of meat products and meat preparations which have the appearance of a cut, joint, slice, portion or carcase of meat, the name of the food shall include an indication of the presence of added water if the added water makes up more than 5% of the weight of the finished product. The same rules shall apply in the case of fishery products and prepared fishery products which have the appearance of a cut, joint, slice, portion, filet or of a whole fishery product.\n7. Meat products, meat preparations and fishery products which may give the impression that they are made of a whole piece of meat or fish, but actually consist of different pieces combined together by other ingredients, including food additives and food enzymes or by other means, shall bear the following indication: [list of translations including 'formed meat' and 'formed fish' in English].\nPART B SPECIFIC REQUIREMENTS CONCERNING THE DESIGNATION OF 'MINCED MEAT'\n1. Composition criteria checked on the basis of a daily average: lean minced meat (Fat content ≤ 7%, Collagen/meat protein ratio ≤ 12%), minced pure beef (Fat content ≤ 20%, Collagen/meat protein ratio ≤ 15%), minced meat containing pigmeat (Fat content ≤ 30%, Collagen/meat protein ratio ≤ 18%), minced meat of other species (Fat content ≤ 25%, Collagen/meat protein ratio ≤ 15%). The collagen/meat protein ratio is expressed as the percentage of collagen in meat protein. The collagen content means the hydroxyproline content multiplied by a factor of 8.\n2. In addition to the requirements laid down in Chapter IV of Section V of Annex III to Regulation (EC) No 853/2004, the following expressions shall appear on the labelling: 'percentage of fat content under ...', 'collagen/meat protein ratio under ...'.\n3. The Member States may allow the placing on their national market of minced meat which does not comply with the criteria laid down in point 1 of this Part under a national mark that cannot be confused with the marks provided for in Article 5(1) of Regulation (EC) No 853/2004.\nPART C SPECIFIC REQUIREMENTS CONCERNING THE DESIGNATION OF SAUSAGE CASINGS\nIf a sausage casing is not edible, this must be indicated."
+    },
+    {
+      "id": "Annex VII",
+      "title": "INDICATION AND DESIGNATION OF INGREDIENTS",
+      "type": "designation_rules",
+      "parts": [
+        {
+          "letter": "A",
+          "title": "SPECIFIC PROVISIONS CONCERNING THE INDICATION OF INGREDIENTS BY DESCENDING ORDER OF WEIGHT",
+          "provisions": [
+            {
+              "topic": "1. Added water and volatile products",
+              "rule": "Shall be listed in order of their weight in the finished product. The amount of water added as an ingredient in a food shall be calculated by deducting from the total amount of the finished product the total amount of the other ingredients used. This amount shall not be required to be taken into consideration if it does not exceed 5% by weight of the finished product. This derogation does not apply to meat, meat preparations, unprocessed fishery products and unprocessed bivalve molluscs."
+            },
+            {
+              "topic": "2. Ingredients used in concentrated or dehydrated form and reconstituted at the time of manufacture",
+              "rule": "May be listed in order of weight as recorded before their concentration or dehydration"
+            },
+            {
+              "topic": "3. Ingredients used in concentrated or dehydrated foods, which are intended to be reconstituted by the addition of water",
+              "rule": "May be listed in order of proportion in the reconstituted product provided that the list of ingredients is accompanied by an expression, such as 'ingredients of the reconstituted product', or 'ingredients of the ready-to-use product'"
+            },
+            {
+              "topic": "4. Fruit, vegetables or mushrooms, none of which significantly predominates in terms of weight and which are used in proportions that are likely to vary, used in a mixture as ingredients of a food",
+              "rule": "May be grouped together in the list of ingredients under the designation 'fruit', 'vegetables' or 'mushrooms' followed by the phrase 'in varying proportions', immediately followed by a list of the fruit, vegetables or mushrooms present. In such cases, the mixture shall be included in the list of ingredients in accordance with Article 18(1), on the basis of the total weight of the fruit, vegetables or mushrooms present"
+            },
+            {
+              "topic": "5. Mixtures of spices or herbs, where none significantly predominates in proportion by weight",
+              "rule": "May be listed in different order provided that that list of ingredients is accompanied by an expression such as 'in variable proportion'"
+            },
+            {
+              "topic": "6. Ingredients constituting less than 2% of the finished product",
+              "rule": "May be listed in a different order after the other ingredients"
+            },
+            {
+              "topic": "7. Ingredients, which are similar or mutually substitutable, likely to be used in the manufacture or preparation of a food without altering its composition, its nature or its perceived value, and in so far as they constitute less than 2% of the finished product",
+              "rule": "May be referred to in the list of ingredients by means of the statement 'contains ... and/or ...', where at least one of no more than two ingredients is present in the finished product. This provision shall not apply to food additives or to ingredients listed in Part C of this Annex, and to substances or products listed in Annex II causing allergies or intolerances"
+            },
+            {
+              "topic": "8. Refined oils of vegetable origin",
+              "rule": "May be grouped together in the list of ingredients under the designation 'vegetable oils', followed immediately by a list of indications of specific vegetable origin, and may be followed by the phrase 'in varying proportions'. If grouped together, vegetable oils shall be included in the list of ingredients in accordance with Article 18(1), on the basis of the total weight of the vegetable oils present. The expression 'fully hydrogenated' or 'partly hydrogenated', as appropriate, must accompany the indication of a hydrogenated oil"
+            },
+            {
+              "topic": "9. Refined fats of vegetable origin",
+              "rule": "May be grouped together in the list of ingredients under the designation 'vegetable fats', followed immediately by a list of indications of specific vegetable origin, and may be followed by the phrase 'in varying proportions'. If grouped together, vegetable fats shall be included in the list of ingredients in accordance with Article 18(1), on the basis of the total weight of the vegetable fats present. The expression 'fully hydrogenated' or 'partly hydrogenated', as appropriate, must accompany the indication of a hydrogenated fat"
+            }
+          ]
+        },
+        {
+          "letter": "B",
+          "title": "DESIGNATION OF CERTAIN INGREDIENTS BY THE NAME OF A CATEGORY RATHER THAN A SPECIFIC NAME",
+          "provisions": [
+            {
+              "topic": "1. Refined oils of animal origin",
+              "rule": "May be designated by the name of that category rather than the specific name."
+            },
+            {
+              "topic": "2. Refined fats of animal origin",
+              "rule": "May be designated by the name of that category rather than the specific name."
+            },
+            {
+              "topic": "3. Mixtures of flour obtained from two or more cereal species",
+              "rule": "May be designated by the name of that category rather than the specific name."
+            },
+            {
+              "topic": "4. Starches, and starches modified by physical means or by enzymes",
+              "rule": "May be designated by the name of that category rather than the specific name."
+            },
+            {
+              "topic": "5. All species of fish where the fish constitutes an ingredient of another food and provided that the food does not refer to a specific species of fish",
+              "rule": "May be designated by the name of that category rather than the specific name."
+            },
+            {
+              "topic": "6. All types of cheese where the cheese or mixture of cheeses constitutes an ingredient of another food and presentation of such food does not refer to a specific type of cheese",
+              "rule": "May be designated by the name of that category rather than the specific name."
+            },
+            {
+              "topic": "7. All spices not exceeding 2% by weight of the food",
+              "rule": "May be designated by the name of that category rather than the specific name."
+            },
+            {
+              "topic": "8. All herbs or parts of herbs not exceeding 2% by weight of the food",
+              "rule": "May be designated by the name of that category rather than the specific name."
+            },
+            {
+              "topic": "9. All types of gum preparations used in the manufacture of gum base for chewing gum",
+              "rule": "May be designated by the name of that category rather than the specific name."
+            },
+            {
+              "topic": "10. All types of crumbed baked cereal products",
+              "rule": "May be designated by the name of that category rather than the specific name."
+            },
+            {
+              "topic": "11. All types of sucrose",
+              "rule": "May be designated by the name of that category rather than the specific name."
+            },
+            {
+              "topic": "12. Anhydrous dextrose or dextrose monohydrate",
+              "rule": "May be designated by the name of that category rather than the specific name."
+            },
+            {
+              "topic": "13. Glucose syrup and anhydrous glucose syrup",
+              "rule": "May be designated by the name of that category rather than the specific name."
+            },
+            {
+              "topic": "14. All types of milk protein (caseins, caseinates and whey proteins) and mixtures thereof",
+              "rule": "May be designated by the name of that category rather than the specific name."
+            },
+            {
+              "topic": "15. Press, expeller or refined cocoa butter",
+              "rule": "May be designated by the name of that category rather than the specific name."
+            },
+            {
+              "topic": "16. All types of wine as covered by Annex XIb to Regulation (EC) No 1234/2007",
+              "rule": "May be designated by the name of that category rather than the specific name."
+            },
+            {
+              "topic": "17. Skeletal muscles of mammalian and bird species recognised as fit for human consumption...",
+              "rule": "May be designated by the name of that category rather than the specific name, subject to maximum fat and connective tissue contents."
+            },
+            {
+              "topic": "18. All types of products covered by the definition of 'mechanically separated meat'",
+              "rule": "May be designated by the name of that category rather than the specific name."
+            }
+          ]
+        },
+        {
+          "letter": "C",
+          "title": "DESIGNATION OF CERTAIN INGREDIENTS BY THE NAME OF THEIR CATEGORY FOLLOWED BY THEIR SPECIFIC NAME OR E NUMBER",
+          "provisions": [
+            {
+              "topic": "Food additives and food enzymes belonging to specific categories",
+              "rule": "Without prejudice to Article 21, food additives and food enzymes other than those specified in point (b) of Article 20 belonging to one of the categories listed in this Part must be designated by the name of that category, followed by their specific name or, if appropriate, E number. Categories: Acid, Acidity regulator, Anti-caking agent, Anti-foaming agent, Antioxidant, Bulking agent, Colour, Emulsifier, Emulsifying salts, Firming agent, Flavour enhancer, Flour treatment agent, Foaming agent, Gelling agent, Glazing agent, Humectant, Modified starch, Preservative, Propellent gas, Raising agent, Sequestrant, Stabiliser, Sweetener, Thickener."
+            }
+          ]
+        },
+        {
+          "letter": "D",
+          "title": "DESIGNATION OF FLAVOURINGS IN THE LIST OF INGREDIENTS",
+          "provisions": [
+            {
+              "topic": "1. Designation terms for flavourings",
+              "rule": "Flavourings shall be designated either by the terms: 'flavouring(s)' or by a more specific name or description of the flavouring... 'smoke flavouring(s)', or 'smoke flavouring(s) produced from food(s) or food category or source(s)'... if the flavouring component contains flavourings as defined in point (f) of Article 3(2) of Regulation (EC) No 1334/2008 and imparts a smoky flavour to the food."
+            },
+            {
+              "topic": "2. The term 'natural'",
+              "rule": "The term 'natural' for the description of flavourings shall be used in accordance with Article 16 of Regulation (EC) No 1334/2008."
+            },
+            {
+              "topic": "3. Quinine and/or caffeine",
+              "rule": "Quinine and/or caffeine used as a flavouring in the production or preparation of a food shall be mentioned by name in the list of ingredients immediately after the term 'flavouring(s)'."
+            }
+          ]
+        },
+        {
+          "letter": "E",
+          "title": "DESIGNATION OF COMPOUND INGREDIENTS",
+          "provisions": [
+            {
+              "topic": "1. Inclusion in the list of ingredients",
+              "rule": "A compound ingredient may be included in the list of ingredients, under its own designation in so far as this is laid down by law or established by custom, in terms of its overall weight, and immediately followed by a list of its ingredients."
+            },
+            {
+              "topic": "2. Exceptions to compulsory listing",
+              "rule": "Without prejudice to Article 21, the list of ingredients for compound ingredients shall not be compulsory: (a) where the composition of the compound ingredient is defined in current Union provisions, and in so far as the compound ingredient constitutes less than 2% of the finished product; however, this provision shall not apply to food additives, subject to points (a) to (d) of Article 20; (b) for compound ingredients consisting of mixtures of spices and/or herbs that constitute less than 2% of the finished product, with the exception of food additives, subject to points (a) to (d) of Article 20; or (c) where the compound ingredient is a food for which a list of ingredients is not required under Union provisions."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "Annex VIII",
+      "title": "QUANTITATIVE INDICATION OF INGREDIENTS",
+      "type": "generic",
+      "content": "1. The quantitative indication shall not be required: (a) in respect of an ingredient or category of ingredients: (i) the drained net weight of which is indicated in accordance with point 5 of Annex IX; (ii) the quantities of which must already appear on the labelling under Union provisions; (iii) which is used in small quantities for the purposes of flavouring; or (iv) which, while appearing in the name of the food, is not such as to govern the choice of the consumer in the country of marketing because the variation in quantity is not essential to characterise the food or does not distinguish it from similar foods; (b) where specific Union provisions stipulate precisely the quantity of an ingredient or of a category of ingredients without providing for the indication thereof on the labelling; or (c) in the cases referred to in points 4 and 5 of Part A of Annex VII.\n2. Points (a) and (b) of Article 22(1) shall not apply in the case of: (a) any ingredient or category of ingredients covered by the indication 'with sweetener(s)' or 'with sugar(s) and sweetener(s)' if that indication accompanies the name of the food, pursuant Annex III; or (b) any added vitamin and mineral if that substance is subject to a nutrition declaration.\n3. The indication of quantity of an ingredient or category of ingredients shall: (a) be expressed as a percentage, which shall correspond to the quantity of the ingredient or ingredients at the time of its/their use; and (b) appear either in or immediately next to the name of the food or in the list of ingredients in connection with the ingredient or category of ingredients in question.\n4. By way of derogation from point 3: (a) where foods have lost moisture following heat treatment or other treatment, the quantity shall be expressed as a percentage which shall correspond to the quantity of the ingredient(s) used, related to the finished product, unless that quantity or the total quantity of all the ingredients indicated on the labelling exceeds 100%, in which case the quantity shall be indicated on the basis of the weight of the ingredient(s) used to prepare 100 g of finished product; (b) the quantity of volatile ingredients shall be indicated on the basis of their proportion by weight in the finished product; (c) the quantity of ingredients used in concentrated or dehydrated form and reconstituted during manufacture may be indicated on the basis of their proportion by weight as recorded before their concentration or dehydration; (d) in the case of concentrated or dehydrated foods which are intended to be reconstituted by the addition of water, the quantity of the ingredients may be indicated on the basis of their proportion by weight in the reconstituted product."
+    },
+    {
+      "id": "Annex IX",
+      "title": "NET QUANTITY DECLARATION",
+      "type": "generic",
+      "content": "1. The net quantity declaration shall not be mandatory in the case of foods: (a) which are subject to considerable losses in their volume or mass and which are sold by number or weighed in the presence of the purchaser; (b) the net quantity of which is less than 5 g or 5 ml; however, this provision shall not apply to spices and herbs; or (c) normally sold by number, provided that the number of items can clearly be seen and easily counted from the outside or, if not, is indicated on the labelling.\n2. Where the indication of a certain type of quantity (such as the nominal quantity, minimum quantity, or average quantity) is required by Union provisions or, where there are none, by national provisions, this quantity shall be regarded as the net quantity for the purposes of this Regulation.\n3. Where a prepacked item consists of two or more individual prepacked items containing the same quantity of the same product, the net quantity shall be indicated by mentioning the net quantity contained in each individual package and the total number of such packages. The indication of those particulars shall not, however, be mandatory where the total number of individual packages can be clearly seen and easily counted from the outside and where at least one indication of the net quantity contained in each individual package can be clearly seen from the outside.\n4. Where a prepacked item consists of two or more individual packages which are not regarded as units of sale, the net quantity shall be given by indicating the total net quantity and the total number of individual packages.\n5. Where a solid food is presented in a liquid medium, the drained net weight of the food shall also be indicated. Where the food has been glazed, the declared net weight of the food shall be exclusive of the glaze. For the purposes of this point, 'liquid medium' shall mean the following products, possibly in mixtures and also where frozen or quick-frozen, provided that the liquid is merely an adjunct to the essential elements of that preparation and is thus not a decisive factor for the purchase: water, aqueous solutions of salts, brine, aqueous solutions of food acids, vinegar, aqueous solutions of sugars, aqueous solutions of other sweetening substances, fruit or vegetable juices in the case of fruit or vegetables."
+    },
+    {
+      "id": "Annex X",
+      "title": "DATE OF MINIMUM DURABILITY, 'USE BY' DATE AND DATE OF FREEZING",
+      "type": "generic",
+      "content": "1. The date of minimum durability shall be indicated as follows: (a) the date shall be preceded by the words: 'Best before...' when the date includes an indication of the day, 'Best before end...' in other cases, (b) the words referred to in point (a) shall be accompanied by: either the date itself, or, a reference to where the date is given on the labelling, If need be, these particulars shall be followed by a description of the storage conditions which must be observed if the product is to keep for the specified period; (c) the date shall consist of the day, the month and possibly, the year, in that order and in uncoded form. However, in the case of foods: which will not keep for more than 3 months, an indication of the day and the month shall be sufficient, which will keep for more than 3 months but not more than 18 months, an indication of the month and year shall be sufficient, which will keep for more than 18 months, an indication of the year shall be sufficient, (d) subject to Union provisions imposing other types of date indication, an indication of the date of minimum durability shall not be required for: fresh fruit and vegetables, including potatoes, which have not been peeled, cut or similarly treated; this derogation shall not apply to sprouting seeds and similar products such as legume sprouts, wines, liqueur wines, sparkling wines, aromatised wines, and similar products obtained from fruit other than grapes, and beverages falling within CN code 2206 00 obtained from grapes or grape musts, beverages containing 10% or more by volume of alcohol, bakers' or pastry cooks' wares which, given the nature of their content, are normally consumed within 24 hours of their manufacture, vinegar, cooking salt, solid sugar, confectionery products consisting almost solely of flavoured and/or coloured sugars, chewing gums and similar chewing products.\n2. The 'use by' date shall be indicated as follows: (a) it shall be preceded by the words 'use by ...'; (b) the words in point (a) shall be accompanied by: either the date itself, or, a reference to where the date is given on the labelling, Those particulars shall be followed by a description of the storage conditions which must be observed; (c) the date shall consist of the day, the month and, possibly, the year, in that order and in uncoded form; (d) the 'use by' date shall be indicated on each individual prepacked portion.\n3. The date of freezing or the date of first freezing as referred to in point 6 of Annex III shall be indicated as follows: (a) it shall be preceded by the words 'Frozen on ...'; (b) the words referred to in point (a) shall be accompanied by: the date itself, or, a reference to where the date is given on the labelling, (c) the date shall consist of the day, the month and the year, in that order and in uncoded form."
+    },
+    {
+      "id": "Annex XI",
+      "title": "TYPES OF MEAT FOR WHICH THE INDICATION OF THE COUNTRY OF ORIGIN OR PLACE OF PROVENANCE IS MANDATORY",
+      "type": "generic",
+      "content": "CN codes (Combined Nomenclature 2010) | Description\n0203 | Meat of swine, fresh, chilled or frozen\n0204 | Meat of sheep or goats, fresh, chilled or frozen\nEx 02 07 | Meat of the poultry of heading 0105, fresh, chilled or frozen"
+    },
+    {
+      "id": "Annex XII",
+      "title": "ALCOHOLIC STRENGTH",
+      "type": "generic",
+      "content": "The actual alcoholic strength by volume of beverages containing more than 1,2% by volume of alcohol shall be indicated by a figure to not more than one decimal place. It shall be followed by the symbol '% vol.' and may be preceded by the word 'alcohol' or the abbreviation 'alc'. The alcoholic strength shall be determined at 20°C.\nPositive and negative allowed tolerances in respect of the indication of the alcoholic strength by volume and expressed in absolute values shall be as listed in the following table. They shall apply without prejudice to the tolerances deriving from the method of analysis used for determining the alcoholic strength.\n1. Beers of CN code 2203 00 having an alcoholic strength not exceeding 5,5% vol.; still beverages falling within CN code 2206 00 obtained from grapes | 0,5 % vol.\n2. Beers having an alcoholic strength exceeding 5,5% vol.; sparkling beverages falling within CN code 2206 00 obtained from grapes, ciders, perries, fruit wines and the like, obtained from fruit other than grapes, whether or not semi-sparkling or sparkling; mead | 1 % vol.\n3. Beverages containing macerated fruit or parts of plants | 1,5 % vol.\n4. Any other beverages containing more than 1,2% by volume of alcohol | 0,3 % vol."
+    },
+    {
+      "id": "Annex XIII",
+      "title": "REFERENCE INTAKES",
+      "type": "generic",
+      "content": "PART A DAILY REFERENCE INTAKES FOR VITAMINS AND MINERALS (ADULTS)\n1. Vitamins and minerals which may be declared and their nutrient reference values (NRVs): Vitamin A (µg) 800, Vitamin D (µg) 5, Vitamin E (mg) 12, Vitamin K (µg) 75, Vitamin C (mg) 80, Thiamin (mg) 1,1, Riboflavin (mg) 1,4, Niacin (mg) 16, Vitamin B6 (mg) 1,4, Folic acid (µg) 200, Vitamin B12 (µg) 2,5, Biotin (µg) 50, Pantothenic acid (mg) 6, Potassium (mg) 2 000, Chloride (mg) 800, Calcium (mg) 800, Phosphorus (mg) 700, Magnesium (mg) 375, Iron (mg) 14, Zinc (mg) 10, Copper (mg) 1, Manganese (mg) 2, Fluoride (mg) 3,5, Selenium (µg) 55, Chromium (µg) 40, Molybdenum (µg) 50, Iodine (µg) 150.\n2. Significant amount of vitamins and minerals: As a rule, the following values should be taken into consideration in deciding what constitutes a significant amount: 15% of the nutrient reference values specified in point 1 supplied by 100 g or 100 ml in the case of products other than beverages, 7,5% of the nutrient reference values specified in point 1 supplied by 100 ml in the case of beverages, or, 15% of the nutrient reference values specified in point 1 per portion if the package contains only a single portion.\nPART B REFERENCE INTAKES FOR ENERGY AND SELECTED NUTRIENTS OTHER THAN VITAMINS AND MINERALS (ADULTS)\nEnergy: 8 400 kJ/2 000 kcal\nTotal fat: 70 g\nSaturates: 20 g\nCarbohydrate: 260 g\nSugars: 90 g\nProtein: 50 g\nSalt: 6 g"
+    },
+    {
+      "id": "Annex XIV",
+      "title": "CONVERSION FACTORS",
+      "type": "generic",
+      "content": "CONVERSION FACTORS FOR THE CALCULATION OF ENERGY\nThe energy value to be declared shall be calculated using the following conversion factors:\ncarbohydrate (except polyols): 17 kJ/g - 4 kcal/g\npolyols: 10 kJ/g - 2,4 kcal/g\nprotein: 17 kJ/g - 4 kcal/g\nfat: 37 kJ/g - 9 kcal/g\nsalatrims: 25 kJ/g - 6 kcal/g\nalcohol (ethanol): 29 kJ/g - 7 kcal/g\norganic acid: 13 kJ/g - 3 kcal/g\nfibre: 8 kJ/g - 2 kcal/g\nerythritol: 0 kJ/g - 0 kcal/g"
+    },
+    {
+      "id": "Annex XV",
+      "title": "EXPRESSION AND PRESENTATION OF NUTRITION DECLARATION",
+      "type": "generic",
+      "content": "The units of measurement to be used in the nutrition declaration for energy (kilojoules (kJ) and kilocalories (kcal)) and mass (grams (g), milligrams (mg) or micrograms (µg)) and the order of presentation of the information, as appropriate, shall be the following:\nenergy: kJ/kcal\nfat: g\nof which saturates: g\nmono-unsaturates: g\npolyunsaturates: g\ncarbohydrate: g\nof which sugars: g\npolyols: g\nstarch: g\nfibre: g\nprotein: g\nsalt: g\nvitamins and minerals: the units specified in point 1 of Part A of Annex XIII"
+    }
+  ]
+}

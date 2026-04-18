@@ -52,11 +52,11 @@ public class SubstitutionOptimizer implements Optimizer {
             if (findings.size() > MAX_FINDINGS) {
                 findings = findings.subList(0, MAX_FINDINGS);
             }
-            findings = findings.stream().map(this::ensureComplianceField).toList();
+            findings = findings.stream().map(this::ensureDefaults).toList();
             String narrative = dto.narrative() != null ? dto.narrative()
                     : "Substitution analysis complete.";
             log.info("SubstitutionOptimizer produced {} findings", findings.size());
-            return new OptimizerResult(type(), findings, narrative, false, null);
+            return new OptimizerResult(type(), findings, narrative, "", false, null, true);
         } catch (JsonExtractionException e) {
             log.warn("SubstitutionOptimizer could not parse Claude response: {}", e.getMessage());
             return OptimizerResult.stub(type(), "model output was not valid JSON");
@@ -66,11 +66,15 @@ public class SubstitutionOptimizer implements Optimizer {
         }
     }
 
-    private Finding ensureComplianceField(Finding f) {
-        if (f.complianceRelevance() != null) return f;
+    private Finding ensureDefaults(Finding f) {
+        ComplianceRelevance cr = f.complianceRelevance() != null
+                ? f.complianceRelevance() : ComplianceRelevance.empty();
+        List<String> derived = f.derivedFrom() != null ? f.derivedFrom() : List.of();
+        if (cr == f.complianceRelevance() && derived == f.derivedFrom()) {
+            return f;
+        }
         return new Finding(f.id(), f.title(), f.summary(), f.rationale(),
-                f.affectedSkus(), f.estimatedImpact(), f.confidence(),
-                ComplianceRelevance.empty());
+                f.affectedSkus(), f.estimatedImpact(), f.confidence(), cr, derived, null);
     }
 
     public record SubstitutionDto(List<Finding> findings, String narrative) {}
