@@ -1,9 +1,9 @@
-# Agnes — Session Summary (Phases 1–9)
+# Agnes — Session Summary (Phases 1–10)
 
-**Date:** 2026-04-18  
+**Date:** 2026-04-19  
 **Stack:** Spring Boot 4.0.0 · Java 21 · SQLite (read-only) · Anthropic claude-sonnet-4-6  
 **Repo:** https://github.com/alpgi1/Agnes.git, branch `master`  
-**Last commit:** 0e18d55  
+**Last commit:** 5a8a1fd  
 **Test count:** 111 total, 0 failures (unit + integration)  
 
 ---
@@ -337,17 +337,67 @@ iherb:
 
 ### Screens & Components
 1. **LandingScreen:** Features a custom Three.js + GSAP spiral particle animation with a delayed "AGNES" logo reveal.
-2. **ChatScreen:** Features a custom Three.js dotted wavy surface background for an immersive feel.
+2. **ChatScreen:** Features a modernized Three.js dotted surface background (`DottedSurface`) — world-space grid (`SEPARATION=150`, 40×60), sine-wave animation, grey dots on black.
 3. **ChatPanel:**
-   - **ModeToggle:** Switch between `Optimize` and `Knowledge` modes.
+   - **ModeToggle:** Moved from header to bottom-left of input area (compact `small` variant). Header now shows only "AGNES" text.
    - **ChatInput:** Auto-resizing textarea with prefix detection (`/optimize` or `/knowledge`).
-   - **MessageList:** Auto-scrolling list of `MessageBubble` components.
+   - **MessageList:** Auto-scrolling list of `MessageBubble` components. Welcome screen has no avatar logo.
    - **ThinkingIndicator:** Honest elapsed timer with staged progression text based on the active mode.
 4. **AssistantMarkdown:** Robust Markdown rendering via `react-markdown` and `remark-gfm`. Custom components format links (open in new tab), tables, code blocks, and compliance badges seamlessly into the dark UI.
+5. **GlowCard (`spotlight-card.tsx`):** Mouse-tracking spotlight border effect applied to all message bubbles. Accepts `glowColor` (`blue`/`purple`/`red`), `customSize`, `className`, `children`. Opacity `0.97` backdrop prevents dot bleed-through.
 
 ### API Integration
 - Dedicated `client.ts` wraps `fetch` with a 180s timeout (accommodating long optimizer runs).
 - Strongly typed request/response DTOs mirroring the backend Java models (`OptimizeResponse`, `KnowledgeResponse`, `Finding`, etc.).
+
+---
+
+## Phase 10 — Performance: Parallel Optimizer Waves + Smart SQL Scoping (commit 5a8a1fd)
+
+### Problem
+Broad queries (e.g. "maximize margins for magnesium and vitamin D across Vitacost, CVS, Target") were timing out at 180s because:
+1. `scope=ALL` fetched all 2860 rows → 60K char prompt → ~15K input tokens per Claude call
+2. `maxTokens=8192` globally → Claude reserved unnecessary output space → slower responses
+3. All 4 optimizers ran sequentially → wall time = sum of all calls
+
+### Parallel Wave Execution (`OptimizeHandler` + `OptimizerDependencies`)
+
+`OptimizerDependencies.waves()` performs a topological sort into parallel levels:
+- **Wave 1:** `SUBSTITUTION + COMPLEXITY` (both independent, run concurrently)
+- **Wave 2:** `CONSOLIDATION + REFORMULATION` (both depend only on SUBSTITUTION, run concurrently after Wave 1)
+
+Uses `Executors.newVirtualThreadPerTaskExecutor()` (Java 21 virtual threads). Each wave fires all steps as `CompletableFuture.supplyAsync(...)` and joins them before proceeding to the next wave. Safe because `OptimizerContext` is fully immutable (Java record + `Map.copyOf()`).
+
+### Smart SQL Scoping (`ScopedDataLoader`)
+
+`load()` now calls `loadSmartAll(userPrompt)` instead of `loadAll()` when `scope=ALL`:
+1. Calls Claude with the `scoped-data-sql.txt` prompt + the user's natural language prompt
+2. Claude extracts mentioned companies/ingredients and generates a filtered WHERE clause
+3. If the SQL returns rows → use them (typically 50–200 rows instead of 2860)
+4. If SQL generation fails, SQL returns empty, or any exception → falls back to `loadAll()` gracefully
+
+`scoped-data-sql.txt` updated with multi-entity OR rules:
+```sql
+-- Multiple companies:
+(c.Name LIKE '%Vitacost%' OR c.Name LIKE '%CVS%' OR c.Name LIKE '%Target%')
+-- Combined with ingredients:
+AND (rm.SKU LIKE '%magnesium%' OR rm.SKU LIKE '%vitamin-d%')
+```
+
+### Per-Call maxTokens Override (`ClaudeClient`)
+
+Added `Integer maxTokens` parameter to the full-param `ask()` and new `askJson(…, int maxTokens)` overloads. All existing callers unchanged (pass `null` → config default).
+
+| Caller | maxTokens |
+|--------|-----------|
+| All 4 optimizers | 2500 |
+| ComplianceChecker | 1200 |
+| Smart SQL generation | 300 |
+| Everything else | 8192 (config default) |
+
+### Expected impact
+- Broad query timeout → **~35–45s** (no timeout)
+- Single-optimizer query (e.g. vitamin D3 substitution) → **~15–20s** (unchanged, maxTokens helps compliance)
 
 ---
 
@@ -416,11 +466,9 @@ User Prompt
             ├── OptimizerDependencies
             │     → inject hidden deps (e.g. SUBSTITUTION for CONSOLIDATION)
             │
-            ├── Optimizer Pipeline (sequential, canonical order)
-            │     ├── SubstitutionOptimizer  → naming clusters
-            │     ├── ConsolidationOptimizer → cross-company volume merges
-            │     ├── ReformulationOptimizer → ingredient form changes
-            │     └── ComplexityOptimizer    → BOM redundancy pairs
+            ├── Optimizer Pipeline (parallel waves)
+            │     Wave 1 (parallel): SubstitutionOptimizer + ComplexityOptimizer
+            │     Wave 2 (parallel): ConsolidationOptimizer + ReformulationOptimizer
             │
             ├── ComplianceChecker (single Claude call)
             │     ├── ComplianceLookupService → EU 1169/2011 articles
