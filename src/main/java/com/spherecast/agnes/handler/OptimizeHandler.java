@@ -10,36 +10,41 @@ import com.spherecast.agnes.handler.optimizers.OptimizerRegistry;
 import com.spherecast.agnes.handler.optimizers.OptimizerResult;
 import com.spherecast.agnes.handler.optimizers.ScopedData;
 import com.spherecast.agnes.service.ScopedDataLoader;
+import com.spherecast.agnes.service.compliance.ComplianceChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class OptimizeHandler {
 
     private static final Logger log = LoggerFactory.getLogger(OptimizeHandler.class);
-    private static final String COMPLIANCE_PENDING = "pending — ComplianceChecker lands in Phase 9";
 
     private final OptimizerRouter router;
     private final ScopedDataLoader scopedDataLoader;
     private final OptimizerRegistry registry;
     private final ResponseComposer composer;
     private final OptimizerDependencies dependencies;
+    private final ComplianceChecker complianceChecker;
 
     public OptimizeHandler(OptimizerRouter router,
                            ScopedDataLoader scopedDataLoader,
                            OptimizerRegistry registry,
                            ResponseComposer composer,
-                           OptimizerDependencies dependencies) {
+                           OptimizerDependencies dependencies,
+                           ComplianceChecker complianceChecker) {
         this.router = router;
         this.scopedDataLoader = scopedDataLoader;
         this.registry = registry;
         this.composer = composer;
         this.dependencies = dependencies;
+        this.complianceChecker = complianceChecker;
     }
 
     public OptimizeResponse handle(OptimizeRequest request) {
@@ -95,11 +100,36 @@ public class OptimizeHandler {
                 .filter(OptimizerResult::userVisible)
                 .toList();
 
-        List<Finding> visibleFindings = visibleResults.stream()
+        // Collect all visible findings for compliance verification
+        List<Finding> rawFindings = visibleResults.stream()
                 .flatMap(r -> r.findings() == null ? List.<Finding>of().stream() : r.findings().stream())
                 .toList();
 
-        String markdown = composer.compose(decision, data, visibleResults, request.prompt());
+        // Run compliance checker (replaces "pending" with real verdicts)
+        List<Finding> verifiedFindings = complianceChecker.verify(rawFindings);
+
+        // Rebuild visibleResults so each contains verified findings
+        Map<String, Finding> verifiedById = verifiedFindings.stream()
+                .filter(f -> f.id() != null)
+                .collect(Collectors.toMap(Finding::id, f -> f, (a, b) -> a));
+
+        List<OptimizerResult> verifiedResults = visibleResults.stream()
+                .map(r -> new OptimizerResult(
+                        r.optimizer(),
+                        r.findings() == null ? List.of() :
+                                r.findings().stream()
+                                        .map(f -> f.id() != null ? verifiedById.getOrDefault(f.id(), f) : f)
+                                        .toList(),
+                        r.narrativeSummary(),
+                        r.reasoningTrace(),
+                        r.skipped(),
+                        r.skipReason(),
+                        r.userVisible()
+                ))
+                .toList();
+
+        String overallStatus = complianceChecker.aggregateStatus(verifiedFindings);
+        String markdown = composer.compose(decision, data, verifiedResults, request.prompt(), overallStatus);
 
         return new OptimizeResponse(
                 sessionId,
@@ -110,8 +140,8 @@ public class OptimizeHandler {
                         decision.scope().value()
                 ),
                 decision.reasoning(),
-                visibleFindings,
-                COMPLIANCE_PENDING,
+                verifiedFindings,
+                overallStatus,
                 System.currentTimeMillis() - start
         );
     }

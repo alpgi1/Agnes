@@ -187,4 +187,27 @@ class OptimizeHandlerIT {
         assertThat(resp.markdown()).contains("## Reformulation");
         assertThat(resp.markdown()).contains("## Complexity");
     }
+
+    @Test
+    void fullPipelineProducesVerifiedFindings() {
+        OptimizeResponse resp = handler.handle(new OptimizeRequest(
+                "Optimiere das gesamte Portfolio.", null, null));
+
+        // Overall status is a real verdict, not "pending"
+        assertThat(resp.complianceStatus())
+                .isIn("compliant", "uncertain", "non-compliant", "not_applicable");
+
+        // Every finding has a real verdict (not "pending")
+        resp.findings().forEach(f -> {
+            assertThat(f.complianceStatus())
+                    .as("Finding %s should not be pending", f.id())
+                    .isIn("compliant", "uncertain", "non-compliant");
+            assertThat(f.complianceEvidence())
+                    .as("Finding %s should have evidence", f.id())
+                    .isNotEmpty();
+        });
+
+        // Markdown contains overall compliance line
+        assertThat(resp.markdown()).contains("Overall compliance:");
+    }
 }

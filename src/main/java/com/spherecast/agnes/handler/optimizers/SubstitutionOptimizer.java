@@ -74,7 +74,8 @@ public class SubstitutionOptimizer implements Optimizer {
             return f;
         }
         return new Finding(f.id(), f.title(), f.summary(), f.rationale(),
-                f.affectedSkus(), f.estimatedImpact(), f.confidence(), cr, derived, null, null);
+                f.affectedSkus(), f.estimatedImpact(), f.confidence(), cr,
+                "pending", derived, null, null, List.of());
     }
 
     public record SubstitutionDto(List<Finding> findings, String narrative) {}

@@ -16,9 +16,16 @@ public class ResponseComposer {
     public String compose(RouterDecision decision,
                           ScopedData data,
                           List<OptimizerResult> results,
-                          String userPrompt) {
+                          String userPrompt,
+                          String overallStatus) {
         StringBuilder sb = new StringBuilder();
         sb.append("# Optimization Report\n\n");
+
+        // Overall compliance top-line
+        sb.append("**Overall compliance:** ").append(statusIcon(overallStatus)).append(" ")
+                .append(overallStatus != null ? overallStatus : "pending");
+        appendComplianceSummaryLine(sb, results, overallStatus);
+        sb.append("\n\n");
 
         sb.append("**Request:** ").append(userPrompt == null ? "(none)" : userPrompt).append("\n\n");
         sb.append("**Scope:** ").append(formatScope(decision.scope())).append("\n");
@@ -46,7 +53,6 @@ public class ResponseComposer {
             }
             List<Finding> findings = result.findings() == null ? List.of() : result.findings();
             if (findings.isEmpty()) {
-                // Don't add "No findings" if the narrative already explained the absence
                 if (result.narrativeSummary() == null || result.narrativeSummary().isBlank()) {
                     sb.append("_No findings._\n\n");
                 }
@@ -57,6 +63,12 @@ public class ResponseComposer {
             }
         }
         return sb.toString().stripTrailing() + "\n";
+    }
+
+    // Backward-compatible overload for tests that don't pass overallStatus
+    public String compose(RouterDecision decision, ScopedData data,
+                          List<OptimizerResult> results, String userPrompt) {
+        return compose(decision, data, results, userPrompt, "pending");
     }
 
     private void appendFinding(StringBuilder sb, Finding f) {
@@ -107,6 +119,34 @@ public class ResponseComposer {
         if (f.estimatedImpact() != null) sb.append("**Impact:** ").append(f.estimatedImpact()).append("\n\n");
         if (f.confidence() != null) sb.append("**Confidence:** ").append(f.confidence()).append("\n\n");
         appendPreFilterFlags(sb, f.complianceRelevance());
+
+        // Compliance verdict + evidence
+        appendComplianceVerdict(sb, f);
+    }
+
+    private void appendComplianceVerdict(StringBuilder sb, Finding f) {
+        if (f.complianceStatus() == null || "pending".equals(f.complianceStatus())) return;
+
+        sb.append("**Compliance:** ").append(statusIcon(f.complianceStatus()))
+                .append(" ").append(f.complianceStatus()).append("\n");
+
+        if (f.complianceEvidence() != null && !f.complianceEvidence().isEmpty()) {
+            sb.append("**Evidence:**\n");
+            for (Finding.EvidenceItem ev : f.complianceEvidence()) {
+                sb.append("- ");
+                if (ev.url() != null && !ev.url().isBlank()) {
+                    sb.append("[").append(nn(ev.sourceRef(), ev.sourceType())).append("](")
+                            .append(ev.url()).append(")");
+                } else {
+                    sb.append(nn(ev.sourceRef(), ev.sourceType()));
+                }
+                if (ev.note() != null && !ev.note().isBlank()) {
+                    sb.append(" — ").append(ev.note());
+                }
+                sb.append("\n");
+            }
+            sb.append("\n");
+        }
     }
 
     private void appendPreFilterFlags(StringBuilder sb, ComplianceRelevance cr) {
@@ -137,6 +177,38 @@ public class ResponseComposer {
             }
             sb.append("\n");
         }
+    }
+
+    private void appendComplianceSummaryLine(StringBuilder sb,
+                                              List<OptimizerResult> results,
+                                              String overallStatus) {
+        if (results == null || results.isEmpty()) return;
+        long total = results.stream()
+                .filter(r -> r.findings() != null)
+                .mapToLong(r -> r.findings().size())
+                .sum();
+        long needVerification = results.stream()
+                .filter(r -> r.findings() != null)
+                .flatMap(r -> r.findings().stream())
+                .filter(f -> "uncertain".equals(f.complianceStatus())
+                        || "non-compliant".equals(f.complianceStatus()))
+                .count();
+        long clear = total - needVerification;
+        if (total > 0) {
+            sb.append(" — ").append(needVerification).append(" finding(s) need verification, ")
+                    .append(clear).append(" clear");
+        }
+    }
+
+    private String statusIcon(String status) {
+        if (status == null) return "⏳";
+        return switch (status) {
+            case "compliant" -> "✅";
+            case "uncertain" -> "⚠️";
+            case "non-compliant" -> "❌";
+            case "not_applicable" -> "ℹ️";
+            default -> "⏳";
+        };
     }
 
     private String titleFor(OptimizerType type) {

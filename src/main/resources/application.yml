@@ -12,6 +12,14 @@ claude:
   base-url: https://api.anthropic.com
   anthropic-version: "2023-06-01"
 
+compliance:
+  regulation-path: classpath:compliance/eu_1169_2011.json
+
+iherb:
+  rapidapi-key: ${IHERB_RAPIDAPI_KEY:PLACEHOLDER}
+  rapidapi-host: iherb1.p.rapidapi.com
+  base-url: https://iherb1.p.rapidapi.com
+
 logging:
   level:
     com.spherecast.agnes: DEBUG

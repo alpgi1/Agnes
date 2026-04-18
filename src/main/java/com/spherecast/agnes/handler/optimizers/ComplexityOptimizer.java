@@ -178,7 +178,7 @@ public class ComplexityOptimizer implements Optimizer {
         ComplianceRelevance cr = parseComplianceRelevance(item.path("compliance_relevance"));
 
         return new Finding(id, title, summary, rationale, affectedSkus,
-                impact, confidence, cr, derivedFrom, null, redundancyPair);
+                impact, confidence, cr, "pending", derivedFrom, null, redundancyPair, List.of());
     }
 
     private Finding.RedundancyPair parseRedundancyPair(JsonNode item) {

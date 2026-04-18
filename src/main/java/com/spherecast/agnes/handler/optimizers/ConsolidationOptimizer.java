@@ -155,7 +155,7 @@ public class ConsolidationOptimizer implements Optimizer {
         ComplianceRelevance cr = parseComplianceRelevance(item.path("compliance_relevance"));
 
         return new Finding(id, title, summary, rationale, affectedSkus,
-                impact, confidence, cr, derivedFrom, null, null);
+                impact, confidence, cr, "pending", derivedFrom, null, null, List.of());
     }
 
     private ComplianceRelevance parseComplianceRelevance(JsonNode node) {

@@ -167,7 +167,7 @@ public class ReformulationOptimizer implements Optimizer {
         }
 
         return new Finding(id, title, summary, rationale, affectedSkus,
-                impact, confidence, cr, derivedFrom, replacement, null);
+                impact, confidence, cr, "pending", derivedFrom, replacement, null, List.of());
     }
 
     private Finding.ProposedReplacement parseProposedReplacement(JsonNode item) {
