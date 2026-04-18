@@ -12,37 +12,71 @@ Given a user prompt, decide TWO things:
   changes.
   Synonyms the user might use: substitute, substitution, merge duplicates,
   consolidate names, deduplicate, same ingredient different name,
-  Substitution, zusammenführen, Dopplungen, gleiche Zutat.
+  Substitution, zusammenführen, Dopplungen, gleiche Zutat, normalize names,
+  naming cleanup, Namensbereinigung, gleiche Rohstoffe, Duplikate,
+  Substitutionskandidaten, identify duplicates, find duplicates.
 
 - CONSOLIDATION: Merge purchasing across multiple companies or product
   lines to negotiate volume discounts with suppliers. Requires substitution
   context but focuses on sourcing leverage.
   Synonyms: consolidate purchasing, volume discount, Mengenrabatt, bündeln,
-  pool buying, combine orders, Konsolidierung, Einkauf bündeln.
+  pool buying, combine orders, Konsolidierung, Einkauf bündeln,
+  Einkaufsvolumen, Volumenbündelung, leverage volume, bulk buying,
+  gemeinsam einkaufen, Bestellungen zusammenlegen.
 
 - REFORMULATION: Swap ingredients with functionally-equivalent but
   chemically-different alternatives that might be cheaper (e.g.
   magnesium-oxide vs magnesium-glycinate). Requires chemistry knowledge.
   Synonyms: reformulate, reformulation, swap ingredient, alternative
   ingredient, cheaper alternative, Reformulation, austauschen,
-  Alternative finden, Zutat ersetzen.
+  Alternative finden, Zutat ersetzen, günstigere Alternative,
+  find alternatives, cheaper form, andere Form, Wirkstoff tauschen,
+  Ersatzstoff, billiger ersetzen.
 
 - COMPLEXITY: Identify ingredients in a BOM whose function overlaps with
   another ingredient in the SAME BOM, so one can be removed.
   Synonyms: reduce complexity, simplify formula, remove redundant
   ingredients, streamline, Komplexität reduzieren, Formel vereinfachen,
-  überflüssige Zutaten.
+  überflüssige Zutaten, redundante Zutaten, BOM vereinfachen,
+  doppelte Funktionen, Rezeptur vereinfachen, Inhaltsstoffe reduzieren.
 
-# Decision Rules
+# Decision Rules — CRITICAL
 
-- If the user EXPLICITLY asks for one optimizer (or uses a clear synonym),
-  return ONLY that optimizer.
-- If the user uses a generic phrase like "optimize my portfolio",
-  "find savings", "analyze this company", "what can we improve",
-  "optimiere", "was können wir verbessern" — return ALL FOUR optimizers
-  in this order: SUBSTITUTION, CONSOLIDATION, REFORMULATION, COMPLEXITY.
-- If the user asks for multiple specific optimizers, return those.
-- If the request is ambiguous, default to ALL FOUR.
+Follow these rules IN ORDER. Stop at the first rule that matches.
+
+Rule 1 — SINGLE OPTIMIZER MATCH:
+  If the user explicitly names one optimizer or uses a clear synonym of
+  exactly ONE optimizer, return ONLY that optimizer.
+  Example: "substitute vitamin D3" → [SUBSTITUTION] only.
+  Example: "find cheaper alternatives for magnesium" → [REFORMULATION] only.
+  Example: "consolidate magnesium purchasing" → [CONSOLIDATION] only.
+  Example: "remove redundant ingredients in product X" → [COMPLEXITY] only.
+
+Rule 2 — MULTIPLE EXPLICIT OPTIMIZERS:
+  If the user explicitly names or uses synonyms of MULTIPLE specific
+  optimizers, return exactly those.
+  Example: "substitute and consolidate vitamin D" → [SUBSTITUTION, CONSOLIDATION].
+
+Rule 3 — GENERIC / BROAD REQUEST:
+  ONLY if the user uses a truly generic phrase that does NOT map to any
+  specific optimizer, return ALL FOUR in canonical order.
+  Generic phrases include: "optimize my portfolio", "find savings",
+  "analyze this company", "what can we improve", "optimiere",
+  "was können wir verbessern", "run full analysis", "komplette Analyse".
+
+Rule 4 — WHEN IN DOUBT, PREFER FEWER:
+  If you are unsure whether the request is generic or specific, lean toward
+  selecting FEWER optimizers — only the one(s) most directly relevant.
+  It is BETTER to run one relevant optimizer than four irrelevant ones.
+
+# IMPORTANT: What is NOT a generic request
+
+These are NOT generic requests — do NOT return all four optimizers for these:
+- "substitute X" or "find substitutions for X" → SUBSTITUTION only
+- "find alternatives for X" or "swap X" → REFORMULATION only
+- "consolidate X" or "bundle purchases for X" → CONSOLIDATION only
+- "simplify formula" or "reduce complexity" → COMPLEXITY only
+- Mentioning a specific ingredient + an action → map the action to ONE optimizer
 
 # Scope Extraction
 
@@ -77,6 +111,9 @@ No markdown, no fences, no prose outside the JSON.
 User: "Find substitution candidates across all companies."
 {"optimizers":["SUBSTITUTION"],"scope":{"type":"ALL","value":null},"reasoning":"User explicitly asked for substitution. No specific target mentioned."}
 
+User: "Substitute vitamin D3."
+{"optimizers":["SUBSTITUTION"],"scope":{"type":"INGREDIENT","value":"vitamin D3"},"reasoning":"User explicitly asked for substitution of a specific ingredient."}
+
 User: "Optimiere das gesamte Portfolio."
 {"optimizers":["SUBSTITUTION","CONSOLIDATION","REFORMULATION","COMPLEXITY"],"scope":{"type":"ALL","value":null},"reasoning":"Generic optimization request — run all four optimizers across the full database."}
 
@@ -91,6 +128,15 @@ User: "Bündele den Magnesium-Einkauf."
 
 User: "Welche redundanten Zutaten gibt es in FG-iherb-14689?"
 {"optimizers":["COMPLEXITY"],"scope":{"type":"PRODUCT","value":"FG-iherb-14689"},"reasoning":"User asked about redundant ingredients — complexity reduction scoped to one product."}
+
+User: "Find cheaper alternatives for vitamin C."
+{"optimizers":["REFORMULATION"],"scope":{"type":"INGREDIENT","value":"vitamin C"},"reasoning":"User asked for cheaper alternatives — this is a reformulation request."}
+
+User: "Gibt es Duplikate bei Vitamin D?"
+{"optimizers":["SUBSTITUTION"],"scope":{"type":"INGREDIENT","value":"vitamin D"},"reasoning":"User asked about duplicates — this is a substitution/deduplication request."}
+
+User: "Substitute and consolidate magnesium across all companies."
+{"optimizers":["SUBSTITUTION","CONSOLIDATION"],"scope":{"type":"INGREDIENT","value":"magnesium"},"reasoning":"User explicitly asked for both substitution and consolidation."}
 
 # Current conversation history (most recent last, may be empty)
 {{HISTORY}}

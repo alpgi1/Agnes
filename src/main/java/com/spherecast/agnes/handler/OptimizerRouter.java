@@ -71,10 +71,15 @@ public class OptimizerRouter {
         }
 
         if (opts.isEmpty()) {
-            log.warn("Router returned zero valid optimizers for prompt: {} — defaulting to all four", userPrompt);
+            log.warn("Router returned zero valid optimizers for prompt: \"{}\" (raw: {}) — defaulting to all four",
+                    userPrompt, dto.optimizers());
             opts = OptimizerType.CANONICAL_ORDER;
         } else if (opts.size() == OptimizerType.values().length) {
+            log.info("Router selected ALL optimizers for prompt: \"{}\"", userPrompt);
             opts = OptimizerType.CANONICAL_ORDER;
+        } else {
+            log.info("Router selectively picked {} optimizer(s) for prompt: \"{}\" → {}",
+                    opts.size(), userPrompt, opts);
         }
 
         Scope scope = parseScope(dto.scope());

@@ -6,7 +6,7 @@ spring:
     name: agnes
 
 claude:
-  api-key: ${ANTHROPIC_API_KEY:PLACEHOLDER}
+  api-key: ${ANTHROPIC_API_KEY}
   model: claude-sonnet-4-6
   max-tokens: 8192
   base-url: https://api.anthropic.com
@@ -16,7 +16,7 @@ compliance:
   regulation-path: classpath:compliance/eu_1169_2011.json
 
 iherb:
-  rapidapi-key: ${IHERB_RAPIDAPI_KEY:PLACEHOLDER}
+  rapidapi-key: ${IHERB_RAPIDAPI_KEY}
   rapidapi-host: iherb1.p.rapidapi.com
   base-url: https://iherb1.p.rapidapi.com
 
