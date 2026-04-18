@@ -4,6 +4,7 @@ import com.spherecast.agnes.dto.ChatMessage;
 import com.spherecast.agnes.dto.KnowledgeRequest;
 import com.spherecast.agnes.dto.KnowledgeResponse;
 import com.spherecast.agnes.repository.AgnesRepository;
+import com.spherecast.agnes.service.HistoryFormatter;
 import com.spherecast.agnes.service.PromptLoader;
 import com.spherecast.agnes.service.QueryExecutionException;
 import com.spherecast.agnes.service.QueryResult;
@@ -30,47 +31,45 @@ public class KnowledgeHandler {
             "^```(?:sql)?\\s*(.+?)\\s*```$", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     private static final int MAX_ROWS_FOR_PROMPT = 50;
     private static final int MAX_PROMPT_JSON_CHARS = 50_000;
-    private static final int MAX_HISTORY_CONTENT_LENGTH = 500;
 
     private final SchemaProvider schemaProvider;
     private final PromptLoader promptLoader;
     private final ClaudeClient claudeClient;
     private final AgnesRepository repository;
     private final ObjectMapper objectMapper;
+    private final HistoryFormatter historyFormatter;
 
     public KnowledgeHandler(SchemaProvider schemaProvider,
                             PromptLoader promptLoader,
                             ClaudeClient claudeClient,
                             AgnesRepository repository,
-                            ObjectMapper objectMapper) {
+                            ObjectMapper objectMapper,
+                            HistoryFormatter historyFormatter) {
         this.schemaProvider = schemaProvider;
         this.promptLoader = promptLoader;
         this.claudeClient = claudeClient;
         this.repository = repository;
         this.objectMapper = objectMapper;
+        this.historyFormatter = historyFormatter;
     }
 
     public KnowledgeResponse handle(KnowledgeRequest request) {
         String sessionId = request.sessionId() != null
                 ? request.sessionId()
                 : UUID.randomUUID().toString();
-        List<ChatMessage> history = request.history() != null
-                ? request.history()
-                : List.of();
+        List<ChatMessage> history = request.history() != null ? request.history() : List.of();
         long startTime = System.currentTimeMillis();
 
         log.info("sessionId={} knowledge.prompt=\"{}\"", sessionId, request.prompt());
 
-        // Step 2: Generate SQL
         String systemPrompt = promptLoader.render("knowledge-schema-to-sql", Map.of(
                 "SCHEMA", schemaProvider.getSchemaAsPromptString(),
-                "HISTORY", formatHistory(history),
+                "HISTORY", historyFormatter.format(history),
                 "QUESTION", request.prompt()
         ));
         String rawSql = claudeClient.ask(systemPrompt, request.prompt(), history, 0.2);
         String sql = stripSqlFences(rawSql.trim());
 
-        // Step 3: Execute with one retry on failure
         ExecResult execResult = executeWithRepair(sql, request.prompt(), sessionId);
 
         if (execResult == null) {
@@ -87,7 +86,6 @@ public class KnowledgeHandler {
         QueryResult queryResult = execResult.result();
         sql = execResult.finalSql();
 
-        // Step 4: Format rows for prompt
         List<Map<String, Object>> rowsForPrompt = queryResult.rows();
         boolean rowsTruncatedForPrompt = false;
         if (rowsForPrompt.size() > MAX_ROWS_FOR_PROMPT) {
@@ -112,9 +110,8 @@ public class KnowledgeHandler {
                 ? ", truncated — more exist"
                 : "";
 
-        // Step 5: Generate answer
         String answerPrompt = promptLoader.render("knowledge-data-to-answer", Map.of(
-                "HISTORY", formatHistory(history),
+                "HISTORY", historyFormatter.format(history),
                 "QUESTION", request.prompt(),
                 "SQL", sql,
                 "ROW_COUNT", String.valueOf(queryResult.rows().size()),
@@ -163,20 +160,5 @@ public class KnowledgeHandler {
             return m.group(1).trim();
         }
         return s;
-    }
-
-    private String formatHistory(List<ChatMessage> history) {
-        if (history == null || history.isEmpty()) {
-            return "(no prior turns)";
-        }
-        StringBuilder sb = new StringBuilder();
-        for (ChatMessage msg : history) {
-            String content = msg.content();
-            if (content.length() > MAX_HISTORY_CONTENT_LENGTH) {
-                content = content.substring(0, MAX_HISTORY_CONTENT_LENGTH) + "...";
-            }
-            sb.append(msg.role()).append(": ").append(content).append("\n");
-        }
-        return sb.toString().stripTrailing();
     }
 }

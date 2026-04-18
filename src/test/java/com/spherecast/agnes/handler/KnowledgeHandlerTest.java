@@ -43,7 +43,8 @@ class KnowledgeHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new KnowledgeHandler(schemaProvider, promptLoader, claudeClient, repository, new ObjectMapper());
+        handler = new KnowledgeHandler(schemaProvider, promptLoader, claudeClient, repository,
+                new ObjectMapper(), new com.spherecast.agnes.service.HistoryFormatter());
         when(schemaProvider.getSchemaAsPromptString()).thenReturn("schema-string");
         // PromptLoader.render just returns a predictable string for any call
         when(promptLoader.render(anyString(), any())).thenAnswer(inv -> inv.getArgument(0));

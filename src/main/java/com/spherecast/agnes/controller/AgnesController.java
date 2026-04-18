@@ -16,7 +16,10 @@ import com.spherecast.agnes.dto.DebugClaudeRequest;
 import com.spherecast.agnes.dto.DebugQueryRequest;
 import com.spherecast.agnes.dto.KnowledgeRequest;
 import com.spherecast.agnes.dto.KnowledgeResponse;
+import com.spherecast.agnes.dto.OptimizeRequest;
+import com.spherecast.agnes.dto.OptimizeResponse;
 import com.spherecast.agnes.handler.KnowledgeHandler;
+import com.spherecast.agnes.handler.OptimizeHandler;
 import com.spherecast.agnes.repository.AgnesRepository;
 import com.spherecast.agnes.service.QueryResult;
 import com.spherecast.agnes.service.SchemaProvider;
@@ -33,17 +36,20 @@ public class AgnesController {
     private final AgnesRepository agnesRepository;
     private final ClaudeClient claudeClient;
     private final KnowledgeHandler knowledgeHandler;
+    private final OptimizeHandler optimizeHandler;
 
     public AgnesController(ClaudeConfig claudeConfig,
                            SchemaProvider schemaProvider,
                            AgnesRepository agnesRepository,
                            ClaudeClient claudeClient,
-                           KnowledgeHandler knowledgeHandler) {
+                           KnowledgeHandler knowledgeHandler,
+                           OptimizeHandler optimizeHandler) {
         this.claudeConfig = claudeConfig;
         this.schemaProvider = schemaProvider;
         this.agnesRepository = agnesRepository;
         this.claudeClient = claudeClient;
         this.knowledgeHandler = knowledgeHandler;
+        this.optimizeHandler = optimizeHandler;
     }
 
     @GetMapping("/health")
@@ -81,6 +87,11 @@ public class AgnesController {
     @PostMapping("/knowledge")
     public KnowledgeResponse knowledge(@Valid @RequestBody KnowledgeRequest req) {
         return knowledgeHandler.handle(req);
+    }
+
+    @PostMapping("/optimize")
+    public OptimizeResponse optimize(@Valid @RequestBody OptimizeRequest req) {
+        return optimizeHandler.handle(req);
     }
 
     // dev-only: round-trips a prompt through ClaudeClient
