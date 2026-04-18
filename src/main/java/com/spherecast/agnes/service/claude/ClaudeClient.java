@@ -57,7 +57,7 @@ public class ClaudeClient {
                 .connectTimeout(Duration.ofSeconds(10))
                 .build();
         JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory(httpClient);
-        factory.setReadTimeout(Duration.ofSeconds(60));
+        factory.setReadTimeout(Duration.ofSeconds(180));
         return RestClient.builder().requestFactory(factory);
     }
 

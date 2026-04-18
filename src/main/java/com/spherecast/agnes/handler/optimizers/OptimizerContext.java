@@ -16,7 +16,8 @@ public record OptimizerContext(
         Map<OptimizerType, OptimizerResult> priorResults
 ) {
     public OptimizerContext withPriorResult(OptimizerType type, OptimizerResult result) {
-        var next = new EnumMap<>(priorResults);
+        var next = new EnumMap<OptimizerType, OptimizerResult>(OptimizerType.class);
+        next.putAll(priorResults);
         next.put(type, result);
         return new OptimizerContext(userPrompt, scope, data, history, sessionId, Map.copyOf(next));
     }

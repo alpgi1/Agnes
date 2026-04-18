@@ -61,7 +61,9 @@ Return ONLY a JSON object with this shape:
 ```
 
 Rules:
-- Emit at MOST 10 findings, highest-confidence first.
+- Emit at MOST 5 findings, highest-confidence first.
+- List at MOST 6 affected_skus per finding (pick the most representative).
+- Keep summary and rationale to 1–2 sentences each. Be concise.
 - `confidence` is one of: "high" | "medium" | "low".
 - Only cluster ingredients you are confident are the same substance.
 - If you find no clusters, return `{"findings": [], "narrative": "No substitution opportunities found in the scoped data."}`.

@@ -111,7 +111,8 @@ If no cluster qualifies for reformulation, return findings: [] with a
 narrative_summary explaining why (e.g. "the portfolio uses ingredient forms
 that are already standard; reformulation opportunities appear limited").
 
-Emit at MOST 10 findings, highest-impact first.
+Emit at MOST 5 findings, highest-impact first.
+List at MOST 6 affected_skus per finding. Keep summary/rationale to 1–2 sentences.
 `confidence` is one of: "high" | "medium" | "low".
 Output ONLY the JSON. No markdown fences, no prose before or after.
 

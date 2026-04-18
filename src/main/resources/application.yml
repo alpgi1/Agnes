@@ -8,7 +8,7 @@ spring:
 claude:
   api-key: ${ANTHROPIC_API_KEY:PLACEHOLDER}
   model: claude-sonnet-4-6
-  max-tokens: 4096
+  max-tokens: 8192
   base-url: https://api.anthropic.com
   anthropic-version: "2023-06-01"
 
