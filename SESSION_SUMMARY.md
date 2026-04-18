@@ -1,4 +1,4 @@
-# Agnes — Session Summary (Phases 1–8)
+# Agnes — Session Summary (Phases 1–9)
 
 **Date:** 2026-04-18  
 **Stack:** Spring Boot 4.0.0 · Java 21 · SQLite (read-only) · Anthropic claude-sonnet-4-6  
@@ -323,6 +323,31 @@ iherb:
 - All four optimizer prompts capped to **5 findings** (was 10) + **6 affected_skus per finding** to prevent token overflow on large portfolios (2860 data rows).
 - Read timeout bumped to **180 s** (complexity optimizer needs >120 s for large portfolios).
 - Fixed `EnumMap` crash in `OptimizerContext.withPriorResult()` when `priorResults` is `Map.of()`.
+
+---
+
+## Phase 9 — React + TypeScript + Vite Frontend
+
+**The UI is now fully built as a single-page React application.**
+
+### Architecture & Tech Stack
+- **Stack:** React 18, Vite, TypeScript, Tailwind CSS, shadcn/ui.
+- **State Management:** Custom hooks (`useChatSession`, `useMode`) with `localStorage` persistence.
+- **No Router:** Simple `AnimatePresence` transition between Landing and Chat screens.
+
+### Screens & Components
+1. **LandingScreen:** Features a custom Three.js + GSAP spiral particle animation with a delayed "AGNES" logo reveal.
+2. **ChatScreen:** Features a custom Three.js dotted wavy surface background for an immersive feel.
+3. **ChatPanel:**
+   - **ModeToggle:** Switch between `Optimize` and `Knowledge` modes.
+   - **ChatInput:** Auto-resizing textarea with prefix detection (`/optimize` or `/knowledge`).
+   - **MessageList:** Auto-scrolling list of `MessageBubble` components.
+   - **ThinkingIndicator:** Honest elapsed timer with staged progression text based on the active mode.
+4. **AssistantMarkdown:** Robust Markdown rendering via `react-markdown` and `remark-gfm`. Custom components format links (open in new tab), tables, code blocks, and compliance badges seamlessly into the dark UI.
+
+### API Integration
+- Dedicated `client.ts` wraps `fetch` with a 180s timeout (accommodating long optimizer runs).
+- Strongly typed request/response DTOs mirroring the backend Java models (`OptimizeResponse`, `KnowledgeResponse`, `Finding`, etc.).
 
 ---
 
