@@ -23,9 +23,17 @@ Scope semantics:
 - COMPANY     — filter Company.Name LIKE '%value%'.
 - PRODUCT     — filter finished-good Product.SKU LIKE '%value%'.
 - INGREDIENT  — filter raw-material Product.SKU LIKE '%value%'.
+- ALL         — extract any mentioned companies and/or ingredients from the user prompt and filter accordingly.
+
+Multi-entity rules (apply when type=ALL or multiple entities are mentioned):
+- Multiple companies: (c.Name LIKE '%A%' OR c.Name LIKE '%B%' OR c.Name LIKE '%C%')
+- Multiple ingredients: (rm.SKU LIKE '%x%' OR rm.SKU LIKE '%y%')
+- Combine company and ingredient filters with AND.
+- If the user mentions both companies AND ingredients, filter by both.
+- If no specific company or ingredient can be identified, return the full portfolio SQL without a WHERE clause.
 
 # Schema
 {{SCHEMA}}
 
-# User prompt (for disambiguation only — do not echo back)
+# User prompt (extract entities from this — do not echo back)
 {{USER_PROMPT}}

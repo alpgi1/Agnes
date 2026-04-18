@@ -68,7 +68,7 @@ public class ConsolidationOptimizer implements Optimizer {
         try {
             JsonNode json = claudeClient.askJson(systemPrompt,
                     ctx.userPrompt() == null ? "Consolidate purchasing." : ctx.userPrompt(),
-                    ctx.history(), TEMPERATURE);
+                    ctx.history(), TEMPERATURE, 2500);
 
             List<Finding> findings = parseFindings(json);
             if (findings.size() > MAX_FINDINGS) {

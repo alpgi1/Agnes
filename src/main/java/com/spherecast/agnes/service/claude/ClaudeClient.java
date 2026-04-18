@@ -71,6 +71,11 @@ public class ClaudeClient {
 
     public String ask(String systemPrompt, String userPrompt,
                       List<ChatMessage> history, Double temperature) {
+        return ask(systemPrompt, userPrompt, history, temperature, null);
+    }
+
+    public String ask(String systemPrompt, String userPrompt,
+                      List<ChatMessage> history, Double temperature, Integer maxTokens) {
         guardApiKey();
 
         List<ChatMessage> messages = new ArrayList<>();
@@ -84,7 +89,7 @@ public class ClaudeClient {
 
         ClaudeMessagesRequest request = new ClaudeMessagesRequest(
                 config.model(),
-                config.maxTokens(),
+                maxTokens != null ? maxTokens : config.maxTokens(),
                 systemPrompt,
                 temperature != null ? temperature : DEFAULT_TEMPERATURE,
                 messages
@@ -111,18 +116,29 @@ public class ClaudeClient {
     }
 
     public JsonNode askJson(String systemPrompt, String userPrompt, List<ChatMessage> history) {
-        String text = ask(withJsonInstruction(systemPrompt), userPrompt, history, JSON_TEMPERATURE);
+        String text = ask(withJsonInstruction(systemPrompt), userPrompt, history, JSON_TEMPERATURE, null);
         return jsonExtractor.extractJson(text);
     }
 
     public JsonNode askJson(String systemPrompt, String userPrompt,
                             List<ChatMessage> history, double temperature) {
-        String text = ask(withJsonInstruction(systemPrompt), userPrompt, history, temperature);
+        String text = ask(withJsonInstruction(systemPrompt), userPrompt, history, temperature, null);
+        return jsonExtractor.extractJson(text);
+    }
+
+    public JsonNode askJson(String systemPrompt, String userPrompt,
+                            List<ChatMessage> history, double temperature, int maxTokens) {
+        String text = ask(withJsonInstruction(systemPrompt), userPrompt, history, temperature, maxTokens);
         return jsonExtractor.extractJson(text);
     }
 
     public <T> T askJson(String systemPrompt, String userPrompt, Class<T> type) {
-        String text = ask(withJsonInstruction(systemPrompt), userPrompt, List.of(), JSON_TEMPERATURE);
+        String text = ask(withJsonInstruction(systemPrompt), userPrompt, List.of(), JSON_TEMPERATURE, null);
+        return jsonExtractor.extractJson(text, type);
+    }
+
+    public <T> T askJson(String systemPrompt, String userPrompt, Class<T> type, int maxTokens) {
+        String text = ask(withJsonInstruction(systemPrompt), userPrompt, List.of(), JSON_TEMPERATURE, maxTokens);
         return jsonExtractor.extractJson(text, type);
     }
 

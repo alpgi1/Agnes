@@ -68,7 +68,7 @@ public class ReformulationOptimizer implements Optimizer {
         try {
             JsonNode json = claudeClient.askJson(systemPrompt,
                     ctx.userPrompt() == null ? "Find reformulation opportunities." : ctx.userPrompt(),
-                    ctx.history(), TEMPERATURE);
+                    ctx.history(), TEMPERATURE, 2500);
 
             List<Finding> findings = parseFindings(json);
             if (findings.size() > MAX_FINDINGS) {

@@ -59,7 +59,7 @@ public class ComplexityOptimizer implements Optimizer {
         try {
             JsonNode json = claudeClient.askJson(systemPrompt,
                     ctx.userPrompt() == null ? "Simplify BOM formulas." : ctx.userPrompt(),
-                    ctx.history(), TEMPERATURE);
+                    ctx.history(), TEMPERATURE, 2500);
 
             List<Finding> findings = parseFindings(json, ingredientToBoms);
             if (findings.size() > MAX_FINDINGS) {

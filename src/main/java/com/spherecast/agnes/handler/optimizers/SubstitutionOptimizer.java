@@ -47,7 +47,7 @@ public class SubstitutionOptimizer implements Optimizer {
         try {
             SubstitutionDto dto = claudeClient.askJson(systemPrompt,
                     ctx.userPrompt() == null ? "Identify substitution clusters." : ctx.userPrompt(),
-                    SubstitutionDto.class);
+                    SubstitutionDto.class, 2500);
             List<Finding> findings = dto.findings() == null ? List.of() : dto.findings();
             if (findings.size() > MAX_FINDINGS) {
                 findings = findings.subList(0, MAX_FINDINGS);

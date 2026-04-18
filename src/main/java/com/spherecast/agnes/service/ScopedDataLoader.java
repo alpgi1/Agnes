@@ -62,9 +62,42 @@ public class ScopedDataLoader {
 
     public ScopedData load(Scope scope, String userPrompt) {
         if (scope == null || scope.type() == ScopeType.ALL) {
-            return loadAll();
+            return loadSmartAll(userPrompt);
         }
         return loadScoped(scope, userPrompt);
+    }
+
+    private ScopedData loadSmartAll(String userPrompt) {
+        if (userPrompt == null || userPrompt.isBlank()) return loadAll();
+        String sql;
+        try {
+            String systemPrompt = promptLoader.render("scoped-data-sql", Map.of(
+                    "SCHEMA", schemaProvider.getSchemaAsPromptString(),
+                    "SCOPE_TYPE", "ALL",
+                    "SCOPE_VALUE", "",
+                    "USER_PROMPT", userPrompt
+            ));
+            String raw = claudeClient.ask(systemPrompt, userPrompt, List.of(), 0.2, 300);
+            sql = stripSqlFences(raw.trim());
+        } catch (Exception e) {
+            log.warn("Smart SQL generation failed — falling back to ALL: {}", e.getMessage());
+            return loadAll();
+        }
+
+        try {
+            QueryResult result = repository.executeScopedQuery(sql, SCOPED_MAX_ROWS);
+            List<DenormRow> rows = mapRows(result.rows());
+            if (rows.isEmpty()) {
+                log.warn("Smart SQL returned 0 rows — falling back to ALL. sql={}", sql);
+                return loadAll();
+            }
+            log.info("Smart SQL scoping: {} rows (vs full portfolio). sql={}", rows.size(), sql);
+            String promptString = buildPromptString(rows, result.truncated());
+            return new ScopedData(rows, rows.size(), result.truncated(), sql, promptString);
+        } catch (Exception e) {
+            log.warn("Smart SQL execution failed — falling back to ALL: {} sql={}", e.getMessage(), sql);
+            return loadAll();
+        }
     }
 
     private ScopedData loadAll() {

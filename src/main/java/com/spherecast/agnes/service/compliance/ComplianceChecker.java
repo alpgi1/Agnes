@@ -73,7 +73,7 @@ public class ComplianceChecker {
             ));
 
             JsonNode response = claudeClient.askJson(system,
-                    "Verify all findings.", List.of(), 0.2);
+                    "Verify all findings.", List.of(), 0.2, 1200);
 
             // 6. Parse verdicts
             Map<String, VerdictDto> verdictMap = parseVerdicts(response);

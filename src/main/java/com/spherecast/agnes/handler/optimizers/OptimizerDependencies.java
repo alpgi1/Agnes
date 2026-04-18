@@ -2,6 +2,8 @@ package com.spherecast.agnes.handler.optimizers;
 
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +48,26 @@ public class OptimizerDependencies {
                 .filter(allNeeded::contains)
                 .map(t -> new ExecutionStep(t, userRequestedSet.contains(t)))
                 .toList();
+    }
+
+    /**
+     * Groups the full execution plan into parallel waves via topological sort.
+     * Steps in the same wave have no dependencies on each other and can run concurrently.
+     */
+    public List<List<ExecutionStep>> waves(List<OptimizerType> userRequested) {
+        List<ExecutionStep> remaining = new ArrayList<>(plan(userRequested));
+        List<List<ExecutionStep>> result = new ArrayList<>();
+        Set<OptimizerType> done = new HashSet<>();
+
+        while (!remaining.isEmpty()) {
+            List<ExecutionStep> wave = remaining.stream()
+                    .filter(s -> done.containsAll(REQUIRES.getOrDefault(s.type(), List.of())))
+                    .toList();
+            result.add(wave);
+            wave.forEach(s -> done.add(s.type()));
+            remaining = remaining.stream().filter(s -> !done.contains(s.type())).toList();
+        }
+        return result;
     }
 
     public record ExecutionStep(OptimizerType type, boolean userVisible) {}

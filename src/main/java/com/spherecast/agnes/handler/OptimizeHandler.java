@@ -19,6 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Service
@@ -59,40 +62,55 @@ public class OptimizeHandler {
         RouterDecision decision = router.route(request.prompt(), history);
         ScopedData data = scopedDataLoader.load(decision.scope(), request.prompt());
 
-        // Expand the router's choice into a full execution plan (with forced precursors)
-        List<OptimizerDependencies.ExecutionStep> plan = dependencies.plan(decision.optimizers());
+        // Expand the router's choice into parallel waves (topological sort)
+        List<List<OptimizerDependencies.ExecutionStep>> waves = dependencies.waves(decision.optimizers());
 
-        log.info("sessionId={} execution plan: {}", sessionId,
-                plan.stream()
-                        .map(s -> s.type() + (s.userVisible() ? "" : "(hidden)"))
+        log.info("sessionId={} execution waves: {}", sessionId,
+                waves.stream()
+                        .map(w -> "[" + w.stream()
+                                .map(s -> s.type() + (s.userVisible() ? "" : "(hidden)"))
+                                .toList() + "]")
                         .toList());
 
         log.info("sessionId={} scope={}:{} data rows={} truncated={}",
                 sessionId, decision.scope().type(), decision.scope().value(),
                 data.totalRows(), data.truncated());
 
-        // Run optimizers in order, threading priorResults through the context
+        // Run each wave in parallel, threading priorResults into the next wave
         OptimizerContext ctx = OptimizerContext.initial(
                 request.prompt(), decision.scope(), data, history, sessionId);
         List<OptimizerResult> results = new ArrayList<>();
 
-        for (var step : plan) {
-            OptimizerResult result;
-            try {
-                result = registry.get(step.type()).run(ctx);
-            } catch (Exception e) {
-                log.warn("sessionId={} optimizer {} threw: {}",
-                        sessionId, step.type(), e.toString());
-                result = OptimizerResult.stub(step.type(), "Failed: " + e.getMessage());
-            }
+        ExecutorService exec = Executors.newVirtualThreadPerTaskExecutor();
+        try {
+            for (List<OptimizerDependencies.ExecutionStep> wave : waves) {
+                final OptimizerContext ctxSnap = ctx;
 
-            // Mark hidden if this optimizer was only a forced precursor
-            if (!step.userVisible()) {
-                result = result.asHidden();
-            }
+                List<CompletableFuture<OptimizerResult>> futures = wave.stream()
+                        .map(step -> CompletableFuture.supplyAsync(() -> {
+                            OptimizerResult r;
+                            try {
+                                r = registry.get(step.type()).run(ctxSnap);
+                            } catch (Exception e) {
+                                log.warn("sessionId={} optimizer {} threw: {}",
+                                        sessionId, step.type(), e.toString());
+                                r = OptimizerResult.stub(step.type(), "Failed: " + e.getMessage());
+                            }
+                            return step.userVisible() ? r : r.asHidden();
+                        }, exec))
+                        .toList();
 
-            results.add(result);
-            ctx = ctx.withPriorResult(step.type(), result);
+                List<OptimizerResult> waveResults = futures.stream()
+                        .map(CompletableFuture::join)
+                        .toList();
+
+                results.addAll(waveResults);
+                for (int i = 0; i < wave.size(); i++) {
+                    ctx = ctx.withPriorResult(wave.get(i).type(), waveResults.get(i));
+                }
+            }
+        } finally {
+            exec.shutdown();
         }
 
         // Only user-visible results end up in the report and response
