@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 
-export type Mode = 'optimize' | 'knowledge';
+export type Mode = 'optimize' | 'knowledge' | 'graph';
 
 export function useMode(initial: Mode = 'optimize') {
   const [mode, setMode] = useState<Mode>(initial);

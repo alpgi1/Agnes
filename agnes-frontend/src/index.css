@@ -68,3 +68,36 @@
 .prose-agnes > :last-child {
   margin-bottom: 0;
 }
+
+/* ── vis-network dark theme overrides ─────────────────────────────── */
+
+/* Tooltip */
+div.vis-tooltip {
+  background: rgba(0, 0, 0, 0.88) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+  border-radius: 10px !important;
+  padding: 10px 14px !important;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+  font-size: 12px !important;
+  line-height: 1.5 !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+  max-width: 280px !important;
+  pointer-events: none !important;
+}
+
+/* Canvas container */
+div.vis-network {
+  background: transparent !important;
+  outline: none !important;
+  border: none !important;
+}
+
+/* Navigation buttons (hidden by default, but style just in case) */
+div.vis-navigation div.vis-button {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 8px !important;
+}

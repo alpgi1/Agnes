@@ -93,3 +93,48 @@ export interface KnowledgeResponse {
   truncated: boolean;
   durationMs: number;
 }
+
+// ── Graph types ───────────────────────────────────────────────────────
+
+export type GraphView = 'company-supplier' | 'company-product' | 'product-supplier';
+
+export type GraphNodeType = 'company' | 'supplier' | 'finished_good' | 'raw_material';
+
+export type GraphEdgeType = 'sources_from' | 'owns' | 'uses' | 'supplied_by';
+
+export interface GraphNode {
+  id: string;
+  label: string;
+  type: GraphNodeType;
+  properties: Record<string, unknown>;
+}
+
+export interface GraphEdge {
+  from: string;
+  to: string;
+  type: GraphEdgeType;
+  properties: Record<string, unknown>;
+}
+
+export interface GraphMeta {
+  view: string;
+  nodeCount: number;
+  edgeCount: number;
+  durationMs: number;
+}
+
+export interface GraphResponse {
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+  meta: GraphMeta;
+}
+
+export interface CompanyOption {
+  Id: number;
+  Name: string;
+}
+
+export interface SupplierOption {
+  Id: number;
+  Name: string;
+}
