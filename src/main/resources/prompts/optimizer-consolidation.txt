@@ -81,8 +81,8 @@ If there are no viable consolidation candidates, return findings: []
 with a clear narrative_summary explaining why (e.g. "all clusters are
 single-company" or "substitution returned no clusters").
 
-Emit at MOST 5 findings, highest-impact first.
-List at MOST 6 affected_skus per finding. Keep summary/rationale to 1–2 sentences.
+Emit EXACTLY 1 finding — the single best consolidation opportunity. Do not emit more than one finding.
+List at MOST 3 affected_skus per finding. Keep summary/rationale to 1 sentence each.
 `confidence` is one of: "high" | "medium" | "low".
 Output ONLY the JSON. No markdown fences, no prose before or after.
 

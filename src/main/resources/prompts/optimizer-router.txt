@@ -58,11 +58,17 @@ Rule 2 — MULTIPLE EXPLICIT OPTIMIZERS:
   Example: "substitute and consolidate vitamin D" → [SUBSTITUTION, CONSOLIDATION].
 
 Rule 3 — GENERIC / BROAD REQUEST:
-  ONLY if the user uses a truly generic phrase that does NOT map to any
-  specific optimizer, return ALL FOUR in canonical order.
-  Generic phrases include: "optimize my portfolio", "find savings",
-  "analyze this company", "what can we improve", "optimiere",
-  "was können wir verbessern", "run full analysis", "komplette Analyse".
+  If the user uses a generic improvement or margin phrase (e.g.,
+  "maximize margins", "find savings", "optimize portfolio",
+  "what can we improve", "improve margins", "reduce costs",
+  "optimiere", "was können wir verbessern") with NO specific optimizer
+  named, return [SUBSTITUTION, REFORMULATION].
+  These two cover the highest-impact margin levers.
+
+  Only return ALL FOUR if the user explicitly requests a full or complete
+  analysis: "run full analysis", "optimize everything", "complete optimization",
+  "run all optimizers", "full portfolio analysis", "alles optimieren",
+  "complete analysis", "all four", "alle vier".
 
 Rule 4 — WHEN IN DOUBT, PREFER FEWER:
   If you are unsure whether the request is generic or specific, lean toward
@@ -121,7 +127,7 @@ User: "Reformulate product FG-iherb-10421 to reduce cost."
 {"optimizers":["REFORMULATION"],"scope":{"type":"PRODUCT","value":"FG-iherb-10421"},"reasoning":"User requested reformulation for a specific product SKU."}
 
 User: "Was können wir bei Company Aloha verbessern?"
-{"optimizers":["SUBSTITUTION","CONSOLIDATION","REFORMULATION","COMPLEXITY"],"scope":{"type":"COMPANY","value":"Aloha"},"reasoning":"Generic improvement request scoped to one company — run all four optimizers."}
+{"optimizers":["SUBSTITUTION","REFORMULATION"],"scope":{"type":"COMPANY","value":"Aloha"},"reasoning":"Generic improvement request scoped to one company — run substitution and reformulation for highest margin impact."}
 
 User: "Bündele den Magnesium-Einkauf."
 {"optimizers":["CONSOLIDATION"],"scope":{"type":"INGREDIENT","value":"magnesium"},"reasoning":"Explicit consolidation request scoped to the magnesium ingredient."}

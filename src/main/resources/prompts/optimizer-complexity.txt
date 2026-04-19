@@ -98,8 +98,8 @@ If no BOM has clear functional redundancy, return findings: [] with a
 narrative_summary explaining why (e.g. "BOMs examined are already lean;
 no clear functional overlaps identified").
 
-Emit at MOST 5 findings total, highest-impact first.
-List at MOST 6 affected_skus per finding. Keep summary/rationale to 1–2 sentences.
+Emit EXACTLY 1 finding — the single clearest functional redundancy. Do not emit more than one finding.
+List at MOST 3 affected_skus per finding. Keep summary/rationale to 1 sentence each.
 `confidence` is one of: "high" | "medium" | "low".
 Output ONLY the JSON. No markdown fences, no prose before or after.
 

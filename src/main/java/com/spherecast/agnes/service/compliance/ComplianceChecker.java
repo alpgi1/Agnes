@@ -41,15 +41,37 @@ public class ComplianceChecker {
         if (findings == null || findings.isEmpty()) return List.of();
 
         try {
-            // 1. Build per-finding legal context
-            Map<String, List<ComplianceLookupService.LookupResult>> legalContext = new LinkedHashMap<>();
+            // 0. Pre-filter: auto-approve findings with no compliance risk indicators
+            List<Finding> needsReview = new ArrayList<>();
+            Map<String, Finding> autoApproved = new LinkedHashMap<>();
             for (Finding f : findings) {
+                if (isAutoCompliant(f)) {
+                    autoApproved.put(f.id() != null ? f.id() : "unknown",
+                            f.withComplianceVerdict("compliant", List.of(
+                                    new Finding.EvidenceItem("claude_reasoning", "pre_filter",
+                                            "No compliance risk indicators — auto-approved (no allergen, animal-origin, novel-food, chemistry, label-claim, or pre-filter flags).", null)
+                            )));
+                } else {
+                    needsReview.add(f);
+                }
+            }
+            log.info("ComplianceChecker: {} auto-approved, {} need review", autoApproved.size(), needsReview.size());
+
+            if (needsReview.isEmpty()) {
+                return findings.stream()
+                        .map(f -> autoApproved.get(f.id() != null ? f.id() : "unknown"))
+                        .toList();
+            }
+
+            // 1. Build per-finding legal context (only for findings needing review)
+            Map<String, List<ComplianceLookupService.LookupResult>> legalContext = new LinkedHashMap<>();
+            for (Finding f : needsReview) {
                 String fid = f.id() != null ? f.id() : "unknown";
                 legalContext.put(fid, lookupService.lookupForFinding(f.complianceRelevance()));
             }
 
-            // 2. Collect unique keywords for iHerb lookup
-            Set<String> uniqueKeywords = findings.stream()
+            // 2. Collect unique keywords for iHerb lookup (only for needsReview)
+            Set<String> uniqueKeywords = needsReview.stream()
                     .filter(f -> f.complianceRelevance() != null)
                     .flatMap(f -> f.complianceRelevance().ingredientKeywordsForLookup() == null
                             ? java.util.stream.Stream.empty()
@@ -60,10 +82,10 @@ public class ComplianceChecker {
             Map<String, IHerbClient.IHerbSearchResult> iherbMap =
                     uniqueKeywords.isEmpty() ? Map.of() : iherbClient.searchAll(uniqueKeywords);
 
-            // 4. Build prompt blocks
-            String findingsBlock = buildFindingsBlock(findings);
-            String legalBlock = buildLegalBlock(findings, legalContext);
-            String iherbBlock = buildIHerbBlock(findings, iherbMap);
+            // 4. Build prompt blocks (only for needsReview)
+            String findingsBlock = buildFindingsBlock(needsReview);
+            String legalBlock = buildLegalBlock(needsReview, legalContext);
+            String iherbBlock = buildIHerbBlock(needsReview, iherbMap);
 
             // 5. Call Claude
             String system = promptLoader.render("compliance-checker", Map.of(
@@ -73,15 +95,19 @@ public class ComplianceChecker {
             ));
 
             JsonNode response = claudeClient.askJson(system,
-                    "Verify all findings.", List.of(), 0.2, 1200);
+                    "Verify all findings.", List.of(), 0.2, 4000);
 
             // 6. Parse verdicts
             Map<String, VerdictDto> verdictMap = parseVerdicts(response);
 
-            // 7. Apply verdicts to findings
+            // 7. Apply verdicts — merge Claude results with auto-approved findings
             List<Finding> result = new ArrayList<>();
             for (Finding f : findings) {
                 String fid = f.id() != null ? f.id() : "unknown";
+                if (autoApproved.containsKey(fid)) {
+                    result.add(autoApproved.get(fid));
+                    continue;
+                }
                 VerdictDto verdict = verdictMap.get(fid);
                 if (verdict != null) {
                     String status = VALID_STATUSES.contains(verdict.status)
@@ -100,7 +126,8 @@ public class ComplianceChecker {
                 }
             }
 
-            log.info("ComplianceChecker verified {} findings", result.size());
+            log.info("ComplianceChecker verified {} findings ({} via Claude, {} auto-approved)",
+                    result.size(), needsReview.size(), autoApproved.size());
             return result;
 
         } catch (Exception e) {
@@ -125,6 +152,20 @@ public class ComplianceChecker {
                 .anyMatch(f -> "uncertain".equals(f.complianceStatus()));
         if (anyUncertain) return "uncertain";
         return "compliant";
+    }
+
+    // ---- Pre-filter ----
+
+    private boolean isAutoCompliant(Finding f) {
+        ComplianceRelevance cr = f.complianceRelevance();
+        if (cr == null) return true;
+        boolean noAllergen = cr.allergenChanges() == null || cr.allergenChanges().isEmpty();
+        boolean noAnimal = cr.animalOriginChanges() == null || cr.animalOriginChanges().isEmpty();
+        boolean noNovelFood = !Boolean.TRUE.equals(cr.novelFoodRisk());
+        boolean noChemistry = !Boolean.TRUE.equals(cr.changesIngredientChemistry());
+        boolean noLabelClaim = !Boolean.TRUE.equals(cr.labelClaimRisk());
+        boolean noPreFilter = cr.preFilterFlags() == null || cr.preFilterFlags().isEmpty();
+        return noAllergen && noAnimal && noNovelFood && noChemistry && noLabelClaim && noPreFilter;
     }
 
     // ---- Prompt block builders ----
@@ -275,8 +316,11 @@ public class ComplianceChecker {
                     ));
                 }
             }
-            // Add reasoning as evidence item
-            if (reasoning != null && !reasoning.isBlank()) {
+            // Only add top-level reasoning if no structured claude_reasoning evidence item exists
+            boolean hasClaudeReasoning = evidence.stream()
+                    .anyMatch(e -> "claude_reasoning".equals(e.sourceType())
+                            && "compliance_checker".equals(e.sourceRef()));
+            if (!hasClaudeReasoning && reasoning != null && !reasoning.isBlank()) {
                 evidence.add(new Finding.EvidenceItem(
                         "claude_reasoning", "compliance_checker", reasoning, null));
             }
@@ -286,6 +330,16 @@ public class ComplianceChecker {
             if (biNode.isArray()) {
                 for (JsonNode bi : biNode) {
                     if (bi.isTextual()) blockingIssues.add(bi.asText());
+                }
+            }
+            // Encode blocking_issues as a pre_filter evidence item for the composer
+            if (!blockingIssues.isEmpty()) {
+                boolean hasPreFilter = evidence.stream()
+                        .anyMatch(e -> "pre_filter".equals(e.sourceType()));
+                if (!hasPreFilter) {
+                    evidence.add(new Finding.EvidenceItem(
+                            "pre_filter", "required_action",
+                            String.join(" ", blockingIssues), null));
                 }
             }
 

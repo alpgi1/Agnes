@@ -17,7 +17,7 @@ public class ConsolidationOptimizer implements Optimizer {
 
     private static final Logger log = LoggerFactory.getLogger(ConsolidationOptimizer.class);
     private static final double TEMPERATURE = 0.3;
-    private static final int MAX_FINDINGS = 10;
+    private static final int MAX_FINDINGS = 1;
 
     private final PromptLoader promptLoader;
     private final ClaudeClient claudeClient;
@@ -68,7 +68,7 @@ public class ConsolidationOptimizer implements Optimizer {
         try {
             JsonNode json = claudeClient.askJson(systemPrompt,
                     ctx.userPrompt() == null ? "Consolidate purchasing." : ctx.userPrompt(),
-                    ctx.history(), TEMPERATURE, 2500);
+                    ctx.history(), TEMPERATURE, 1500);
 
             List<Finding> findings = parseFindings(json);
             if (findings.size() > MAX_FINDINGS) {
@@ -139,9 +139,9 @@ public class ConsolidationOptimizer implements Optimizer {
 
         // affected_skus
         List<Finding.AffectedSku> affectedSkus = new ArrayList<>();
-        JsonNode skusNode = item.path("affected_skus");
+        int skuCap = 3; JsonNode skusNode = item.path("affected_skus");
         if (skusNode.isArray()) {
-            for (JsonNode s : skusNode) {
+            int _skuIdx = 0; for (JsonNode s : skusNode) { if (_skuIdx++ >= skuCap) break;
                 affectedSkus.add(new Finding.AffectedSku(
                         s.path("company").asText(null),
                         s.path("product").asText(null),

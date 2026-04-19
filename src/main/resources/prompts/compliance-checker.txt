@@ -33,17 +33,21 @@ you must issue a verdict:
 
 # Evidence requirements
 
-For every finding you issue, return 1-4 evidence items. Each item has:
-  - source_type:  "eu_regulation" | "iherb" | "pre_filter" | "claude_reasoning"
-  - source_ref:   e.g. "EU 1169/2011 Article 21" or "iherb:magnesium-glycinate"
-                  or "pre-filter flag"
-  - note:         one sentence explaining relevance
-  - url:          nullable; use when available from the input data
+For every finding you issue, return exactly 3 evidence items — one of each type below:
 
-At least one evidence item must cite provided EU regulation context OR
-iHerb data whenever either is supplied for the finding. A verdict with
-ONLY claude_reasoning evidence is valid only when neither input was
-available.
+1. source_type "eu_regulation" — cite the most relevant EU 1169/2011 article.
+   note: 1 sentence max — what the article requires and how it applies here.
+   source_ref: e.g. "EU 1169/2011 Article 9"
+
+2. source_type "claude_reasoning" with source_ref "compliance_checker" — the specific
+   risk: WHY this optimization might create a compliance problem.
+   note: 2 sentences max. Be direct — state the risk mechanism only, no background.
+
+3. source_type "pre_filter" with source_ref "required_action" — actionable steps.
+   note: 2-3 short bullet points (each ≤ 15 words). No paragraphs.
+   Example: "1) Confirm supplier cert. 2) Update label text. 3) Verify dose calc."
+
+If no EU regulation is relevant, emit source_type "claude_reasoning" for item 1 instead.
 
 # Output
 

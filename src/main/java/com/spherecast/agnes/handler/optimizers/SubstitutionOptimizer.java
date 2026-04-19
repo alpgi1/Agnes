@@ -15,7 +15,7 @@ public class SubstitutionOptimizer implements Optimizer {
 
     private static final Logger log = LoggerFactory.getLogger(SubstitutionOptimizer.class);
     private static final double TEMPERATURE = 0.3;
-    private static final int MAX_FINDINGS = 10;
+    private static final int MAX_FINDINGS = 1;
 
     private final PromptLoader promptLoader;
     private final ClaudeClient claudeClient;
@@ -47,7 +47,7 @@ public class SubstitutionOptimizer implements Optimizer {
         try {
             SubstitutionDto dto = claudeClient.askJson(systemPrompt,
                     ctx.userPrompt() == null ? "Identify substitution clusters." : ctx.userPrompt(),
-                    SubstitutionDto.class, 2500);
+                    SubstitutionDto.class, 1500);
             List<Finding> findings = dto.findings() == null ? List.of() : dto.findings();
             if (findings.size() > MAX_FINDINGS) {
                 findings = findings.subList(0, MAX_FINDINGS);
