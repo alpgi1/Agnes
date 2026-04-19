@@ -24,7 +24,7 @@ class GraphServiceTest {
 
     @Test
     void companySupplierGraph_returnsNodesAndEdges() {
-        GraphResponse response = graphService.getCompanySupplierGraph();
+        GraphResponse response = graphService.getCompanySupplierGraph(null, null);
 
         assertThat(response.meta().view()).isEqualTo("company-supplier");
         assertThat(response.nodes()).isNotEmpty();
