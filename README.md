@@ -4,30 +4,45 @@
 
 ---
 
-<!-- 📸 Screenshots / demo GIFs go here -->
-
----
-
 ## Table of Contents
 
+- [Problem Statement](#problem-statement)
 - [Overview](#overview)
 - [Key Features](#key-features)
+- [How Agnes Addresses the Core Challenge](#how-agnes-addresses-the-core-challenge)
 - [Architecture](#architecture)
 - [Tech Stack](#tech-stack)
 - [Getting Started](#getting-started)
-- [Usage](#usage)
 - [Optimization Pipeline](#optimization-pipeline)
+- [External Data Enrichment](#external-data-enrichment)
 - [Compliance Engine](#compliance-engine)
+- [Explainability & Evidence Trails](#explainability--evidence-trails)
+- [Handling Uncertainty & Trustworthiness](#handling-uncertainty--trustworthiness)
 - [Graph Explorer](#graph-explorer)
 - [API Reference](#api-reference)
-- [Project Structure](#project-structure)
-- [Configuration](#configuration)
+- [Scalability & Future Vision](#scalability--future-vision)
+
+---
+
+## Problem Statement
+
+CPG companies regularly overpay because sourcing is fragmented. The same ingredient may be purchased by multiple companies, plants, or product lines without anyone having full visibility into the combined demand. That means:
+
+- **Suppliers do not see the true buying volume** — orders are not consolidated across business units.
+- **Buyers lose leverage** on price, lead time, and service levels.
+- **Consolidation is only valuable if the components are actually substitutable** and still compliant in the context of the end product.
+
+The challenge goes far beyond simple cost optimization. A cheaper or more consolidated alternative must still satisfy the quality and compliance requirements of the finished product. This requires combining structured internal data with incomplete external evidence — supplier websites, product listings, certification databases, public product pages, and regulatory references. **A sourcing recommendation is only valid if the system can justify that compliance and quality constraints are still met.**
+
+The focus lies on making incomplete and messy data actionable: identifying functional substitutes, inferring compliance-relevant requirements, and producing an explainable sourcing proposal that balances supplier consolidation, lead time, and practical feasibility.
+
+At [Spherecast](https://spherecast.com), we think of this capability as **Agnes** — an AI Supply Chain Manager that helps teams make better sourcing decisions by reasoning across fragmented supply chain data.
 
 ---
 
 ## Overview
 
-Agnes is a full-stack AI application that acts as a supply-chain analyst for Consumer Packaged Goods (CPG) companies. It connects to a read-only SQLite database containing ingredient, supplier, product, and company data, then uses Claude (Anthropic) as its reasoning engine.
+Agnes is a full-stack AI decision-support application that acts as a supply-chain analyst for CPG companies. It ingests normalized bill-of-materials (BOM) data and supplier mappings from a read-only SQLite database, enriches this with external market evidence, and uses Claude (Anthropic) as its reasoning engine to produce explainable, compliance-verified sourcing recommendations.
 
 Agnes operates in three modes:
 
@@ -42,13 +57,34 @@ Agnes operates in three modes:
 ## Key Features
 
 - **Natural-language interface** — Ask questions or give instructions in plain English or German; Agnes routes them to the right subsystem automatically.
+- **Functional substitution detection** — Identifies ingredients that are chemically equivalent or functionally interchangeable, even when listed under different names across companies or product lines.
 - **Wave-based parallel optimizer execution** — Wave 1 (Substitution + Complexity) and Wave 2 (Consolidation + Reformulation) run concurrently using Java virtual threads.
 - **EU Regulatory compliance checking** — Every optimization finding is verified against EU 1169/2011 (food information to consumers) before being shown to the user.
+- **External data enrichment** — Combines internal BOM/supplier data with market evidence from external sources (e.g., iHerb product listings, certifications, sourcing info) to validate recommendations.
+- **Explainable evidence trails** — Every finding carries structured evidence items (EU regulation references, AI reasoning, required actions) so that procurement teams can audit and trust the recommendations.
 - **Smart SQL scoping** — Agnes generates targeted SQL from the user's prompt instead of loading all data, keeping context windows small and responses fast.
 - **Pre-filter compliance bypass** — Findings with no allergen, animal-origin, novel-food, chemistry, or label-claim risk are auto-approved without an additional Claude call.
 - **Interactive graph visualization** — Three graph views (Company↔Supplier, Company↔Product, Product↔Supplier) rendered with vis-network in the frontend.
 - **Read-only database access** — All SQL is routed through `SqlGuard`, which enforces SELECT-only and blocks schema modifications.
-- **Structured audit trail** — Every finding carries evidence items (EU regulation, Claude reasoning, required actions) that are surfaced in the report.
+- **Uncertainty-aware verdicts** — Compliance results are classified as `compliant`, `uncertain`, or `non-compliant`, explicitly surfacing where human review is needed rather than hiding ambiguity.
+
+---
+
+## How Agnes Addresses the Core Challenge
+
+The hackathon challenge requires teams to solve three interconnected problems. Here is how Agnes addresses each:
+
+### 1. Identify functionally interchangeable components
+
+Agnes's **Substitution Optimizer** and **Complexity Optimizer** analyze the ingredient portfolio to find materials that are chemically equivalent (e.g., "Cholecalciferol" vs. "Vitamin D3") or functionally redundant across product lines. The system reasons at the raw-ingredient level, inferring equivalence even when naming conventions differ across companies.
+
+### 2. Infer quality and compliance requirements
+
+Rather than requiring manually curated compliance rules, Agnes **infers** which regulations apply based on the characteristics of each proposed change. The `ComplianceRelevance` metadata — allergen flags, animal-origin flags, novel food risk, chemistry changes, and label-claim risk — is extracted by the optimizer and used to determine which EU 1169/2011 articles are relevant. External market evidence (certifications, sourcing data) is gathered to fill gaps in the internal data.
+
+### 3. Produce explainable sourcing recommendations
+
+Every finding in the final report includes a structured evidence trail: the regulatory context that applies, the specific risk mechanism, and 2–3 actionable steps for the procurement team. Findings are never presented without justification — the system always shows *why* a recommendation is safe (or not) and *what* needs to happen next.
 
 ---
 
@@ -57,36 +93,38 @@ Agnes operates in three modes:
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                        React Frontend                           │
-│   ChatView  │  GraphExplorer  │  CompanyFilter  │  Markdown     │
+│  ChatScreen  │  GraphScreen  │  ModeToggle  │  Markdown         │
 └────────────────────────┬────────────────────────────────────────┘
                          │  HTTP / REST
 ┌────────────────────────▼────────────────────────────────────────┐
 │                    Spring Boot Backend                          │
 │                                                                 │
-│  /api/optimize ──► AgnesHandler                                 │
+│  /api/optimize ──► OptimizeHandler                              │
 │                        │                                        │
 │              ┌─────────▼──────────┐                             │
-│              │    RouterDecision  │  (optimizer-router prompt)  │
+│              │   OptimizerRouter  │  (optimizer-router prompt)  │
 │              └─────────┬──────────┘                             │
 │                        │                                        │
 │          ┌─────────────▼─────────────┐                          │
-│          │     Wave Execution        │  (virtual threads)       │
-│          │  Wave 1: SUB + COMPLEX    │                          │
-│          │  Wave 2: CONSOL + REFORM  │                          │
+│          │  Parallel Execution       │  (with dependencies)     │
+│          │  SUB & CONSOL & REFORM    │                          │
+│          │        & COMPLEX          │                          │
 │          └─────────────┬─────────────┘                          │
 │                        │                                        │
 │          ┌─────────────▼─────────────┐                          │
 │          │    ComplianceChecker      │  (EU 1169/2011 lookup    │
-│          │  pre-filter → Claude      │   + iHerb evidence)      │
+│          │   pre-filter →            |                          | 
+|          |   post-processing         │   + external evidence)   │
 │          └─────────────┬─────────────┘                          │
 │                        │                                        │
 │          ┌─────────────▼─────────────┐                          │
-│          │    ResponseComposer       │  (Markdown report)       │
+│          │    ResponseComposer       │  (Markdown report with   │
+│          │                           │   evidence trails)       │
 │          └───────────────────────────┘                          │
 │                                                                 │
-│  /api/graph/* ──► GraphController ──► GraphService              │
+│  /api/knowledge ──► KnowledgeHandler                            │
 │                                                                 │
-│  /api/optimize (knowledge) ──► KnowledgeHandler                 │
+│  /api/graph/* ──► GraphController ──► GraphService              │
 │                                                                 │
 │  SQLite (read-only) via SqlGuard + SchemaProvider               │
 └─────────────────────────────────────────────────────────────────┘
@@ -177,49 +215,18 @@ The dev server starts on **port 5173**. Open [http://localhost:5173](http://loca
 
 ---
 
-## Usage
-
-Agnes understands natural language. Type your instruction in the chat input.
-
-### Optimization examples
+### Knowledge & Optimization examples
 
 ```
-Agnes, please maximize the profit margins for all magnesium and vitamin D products
-across the Vitacost, CVS, and Target brands.
+What are the current suppliers for Vitamin-B products? (Knowledge)
 ```
 
 ```
-Can you substitute all vitamin D3 across our portfolio?
+Can you substitute all vitamin D3? (Substitution + Compliance)
 ```
 
 ```
-Run a full analysis on everything — all four optimizers.
-```
-
-```
-Find consolidation opportunities for our omega-3 suppliers.
-```
-
-### Knowledge / Q&A examples
-
-```
-Which supplier provides our magnesium glycinate?
-```
-
-```
-How many SKUs use lanolin-derived vitamin D3?
-```
-
-```
-What is our current supplier count for B-vitamin products?
-```
-
-### Scoped optimization
-
-Agnes automatically detects scope from your prompt. Mentioning a company name, ingredient, or supplier narrows the SQL query and speeds up the response.
-
-```
-Optimize the omega-3 portfolio for Vitacost only.
+Please maximize the profit margins for all magnesium and vitamin D products across the Vitacost, CVS, and Target brands (Substitution + Reformulation +Compliance)
 ```
 
 ---
@@ -231,7 +238,7 @@ Optimize the omega-3 portfolio for Vitacost only.
 | Optimizer | What it finds | Example finding |
 |---|---|---|
 | **SUBSTITUTION** | Ingredients used under different names that are chemically equivalent | *"Cholecalciferol" and "Vitamin D3" are the same molecule — consolidate to one SKU* |
-| **CONSOLIDATION** | Multiple suppliers for the same ingredient where one preferred supplier could serve all | *"Three suppliers for magnesium oxide — pool volume to Supplier A for 12% cost reduction"* |
+| **CONSOLIDATION** | Multiple suppliers for the same ingredient where volume can be pooled | *"Three suppliers for magnesium oxide — pool volume to Supplier A for 12% cost reduction"* |
 | **REFORMULATION** | Ingredient form changes that improve bioavailability or reduce cost | *"Magnesium oxide → magnesium glycinate — better absorption, stable pricing"* |
 | **COMPLEXITY** | Redundant SKUs in the portfolio that serve the same function | *"Remove SKU-447 — identical formulation to SKU-312, covered by the same supplier"* |
 
@@ -259,6 +266,21 @@ findings[] ──► ComplianceChecker ──► ResponseComposer ──► Mark
 
 ---
 
+## External Data Enrichment
+
+Agnes goes beyond internal BOM and supplier data by enriching findings with external market evidence. This is critical because internal databases alone rarely contain enough information to validate whether a substitution is compliant and commercially viable.
+
+### Current enrichment sources
+
+- **iHerb market evidence** — The `IHerbClient` retrieves product listings, certifications, and sourcing information for ingredients under consideration. This provides real-world evidence of ingredient availability, common formulations, and supplier certifications.
+- **EU 1169/2011 regulatory excerpts** — The `ComplianceLookupService` maintains a structured lookup of EU food-information regulation articles, keyed by compliance-risk category (allergens, novel food, animal origin, etc.).
+
+### How enrichment is used
+
+External evidence is injected directly into the compliance verification prompt alongside internal findings. Claude evaluates whether the evidence supports or contradicts a proposed change, producing verdicts grounded in real data rather than parametric knowledge alone. When external sources are unavailable, the system explicitly notes this limitation in the evidence trail rather than silently proceeding.
+
+---
+
 ## Compliance Engine
 
 Every finding produced by an optimizer passes through the compliance pipeline before appearing in the report.
@@ -272,13 +294,12 @@ Findings with **none** of the following flags are auto-approved as `compliant` w
 - Novel food risk
 - Ingredient chemistry changes
 - Label claim risk
-- Pre-filter flags
 
 ### Stage 2 — Legal context lookup
 
-For findings that pass the pre-filter, the `ComplianceLookupService` retrieves relevant EU 1169/2011 excerpts keyed to the finding's `ComplianceRelevance` metadata.
+For findings that trigger compliance flags, the `ComplianceLookupService` retrieves relevant EU 1169/2011 excerpts keyed to the finding's `ComplianceRelevance` metadata.
 
-### Stage 3 — Claude verification + iHerb market evidence
+### Stage 3 — Post-proessing (with Claude verification)
 
 The remaining findings are batched into a single Claude call alongside:
 - The legal excerpts from Stage 2
@@ -295,7 +316,34 @@ Claude returns a verdict for each finding:
 Each verdict includes three structured evidence items:
 1. **Regulatory Context** — relevant EU regulation article and how it applies
 2. **Specific Risk** — the precise compliance risk mechanism
-3. **Required Action** — 2-3 actionable steps for the procurement team
+3. **Required Action** — 2–3 actionable steps for the procurement team
+
+---
+
+## Explainability & Evidence Trails
+
+Agnes is designed so that no recommendation is presented without justification. Every optimization finding in the final Markdown report includes:
+
+- **Finding ID** (e.g., `SUB-001`, `CONSOL-002`) for traceability
+- **What changed** — the specific substitution, consolidation, or reformulation proposed
+- **Why it's beneficial** — cost savings, volume leverage, reduced complexity
+- **Compliance verdict** — `compliant` / `uncertain` / `non-compliant` with reasoning
+- **Evidence items** — structured references to EU regulations, market data, and AI reasoning
+- **Required actions** — concrete next steps for the procurement team
+
+This structured audit trail allows procurement teams to review, challenge, and act on recommendations with confidence rather than relying on opaque AI outputs.
+
+---
+
+## Handling Uncertainty & Trustworthiness
+
+Agnes explicitly models uncertainty rather than hiding it:
+
+- **Three-tier compliance verdicts** — `compliant`, `uncertain`, and `non-compliant` ensure that ambiguous cases are flagged for human review rather than silently approved or rejected.
+- **Evidence gaps are surfaced** — When external data sources are unavailable (e.g., iHerb returns no results), the system reports this in the evidence trail with a stub reason, so users know the limitation.
+- **Read-only database access** — `SqlGuard` enforces SELECT-only queries and blocks schema modifications, `--` comments, `;` injection, and subquery escape patterns, preventing the AI from modifying or corrupting data.
+- **Scoped SQL generation** — Rather than loading the entire database into the context window, Agnes generates targeted queries scoped to the user's request, reducing the surface area for hallucination.
+- **Structured output parsing** — Optimizer results are parsed into strongly-typed Java records (`Finding`, `ComplianceRelevance`, `OptimizerResult`), enforcing schema conformance and catching malformed AI outputs before they reach the user.
 
 ---
 
@@ -330,27 +378,14 @@ Bipartite graph showing which raw materials are sourced from which suppliers.
 
 ### POST `/api/optimize`
 
-Main chat endpoint. Handles both optimization and knowledge queries.
+Runs the optimization pipeline (router → optimizers → compliance → report).
 
-**Request:**
-```json
-{
-  "message": "Agnes, please maximize the profit margins for all magnesium products.",
-  "history": [
-    { "role": "user", "content": "..." },
-    { "role": "assistant", "content": "..." }
-  ]
-}
-```
 
-**Response:**
-```json
-{
-  "message": "**Optimization Report**\n* **Scope:** ...\n* **Overall Compliance:** ...\n\n**SUB-001: ...**\n..."
-}
-```
+### POST `/api/knowledge`
 
----
+Answers factual questions about the supply chain data using SQL generation.
+
+
 
 ### GET `/api/graph/company-supplier`
 
@@ -358,70 +393,27 @@ Returns the Company ↔ Supplier graph.
 
 **Query params:** `companyId` (optional), `supplierId` (optional)
 
-**Response:**
-```json
-{
-  "nodes": [
-    { "id": "company-1", "label": "Vitacost", "type": "company", "properties": {} },
-    { "id": "supplier-42", "label": "NutriSource", "type": "supplier", "properties": {} }
-  ],
-  "edges": [
-    { "id": "e-1-42", "from": "company-1", "to": "supplier-42", "type": "sources_from",
-      "properties": { "product_count": 7 } }
-  ],
-  "meta": { "view": "company-supplier", "nodeCount": 2, "edgeCount": 1 }
-}
-```
-
----
-
 ### GET `/api/graph/company-product`
 
 Returns the Company ↔ Product graph.
 
 **Query params:** `companyId` (optional)
 
----
-
 ### GET `/api/graph/product-supplier`
 
 Returns the Product ↔ Supplier bipartite graph.
-
----
 
 ### GET `/api/graph/companies`
 
 Returns a flat list of companies for the filter dropdown.
 
-**Response:**
-```json
-[
-  { "Id": 1, "Name": "Vitacost" },
-  { "Id": 2, "Name": "CVS" }
-]
-```
-
----
-
 ### GET `/api/health`
 
 Basic liveness check. Returns `200 OK` with `"Agnes is healthy"`.
 
----
-
 ### GET `/api/health/config`
 
-Reports runtime configuration state.
-
-```json
-{
-  "apiKeyPresent": true,
-  "databaseConnected": true,
-  "schemaLoaded": true
-}
-```
-
----
+Reports runtime configuration state: `apiKeyPresent`, `databaseConnected`, `schemaLoaded`.
 
 ### GET `/api/debug/schema`
 
@@ -429,94 +421,10 @@ Returns the full database schema as seen by Agnes (table names + column definiti
 
 ---
 
-## Project Structure
+## Scalability & Future Vision
 
-```
-Agnes/
-├── src/
-│   ├── main/
-│   │   ├── java/com/spherecast/agnes/
-│   │   │   ├── AgnesApplication.java          # Entry point
-│   │   │   ├── controller/
-│   │   │   │   ├── AgnesController.java        # POST /api/optimize
-│   │   │   │   ├── GraphController.java        # GET /api/graph/*
-│   │   │   │   └── HealthController.java       # GET /api/health
-│   │   │   ├── handler/
-│   │   │   │   ├── AgnesHandler.java           # Main request orchestrator
-│   │   │   │   ├── KnowledgeHandler.java       # Q&A mode
-│   │   │   │   ├── ResponseComposer.java       # Markdown report builder
-│   │   │   │   ├── RouterDecision.java         # Router output record
-│   │   │   │   └── optimizers/
-│   │   │   │       ├── Optimizer.java          # Interface
-│   │   │   │       ├── OptimizerContext.java   # Per-run context
-│   │   │   │       ├── OptimizerResult.java    # Result + findings
-│   │   │   │       ├── Finding.java            # Core finding record
-│   │   │   │       ├── ComplianceRelevance.java
-│   │   │   │       ├── ScopedData.java
-│   │   │   │       ├── SubstitutionOptimizer.java
-│   │   │   │       ├── ConsolidationOptimizer.java
-│   │   │   │       ├── ReformulationOptimizer.java
-│   │   │   │       └── ComplexityOptimizer.java
-│   │   │   ├── service/
-│   │   │   │   ├── GraphService.java           # Graph query logic
-│   │   │   │   ├── PromptLoader.java           # Loads + caches prompts
-│   │   │   │   ├── SmartDataLoader.java        # Scoped SQL generation
-│   │   │   │   ├── SchemaProvider.java         # DB schema introspection
-│   │   │   │   ├── SqlGuard.java               # SELECT-only enforcement
-│   │   │   │   └── compliance/
-│   │   │   │       ├── ComplianceChecker.java  # Main compliance orchestrator
-│   │   │   │       ├── ComplianceLookupService.java  # EU reg lookup
-│   │   │   │       └── IHerbClient.java        # iHerb market evidence
-│   │   │   └── service/claude/
-│   │   │       └── ClaudeClient.java           # Anthropic API client
-│   │   └── resources/
-│   │       ├── application.properties
-│   │       └── prompts/
-│   │           ├── optimizer-router.txt
-│   │           ├── optimizer-substitution.txt
-│   │           ├── optimizer-consolidation.txt
-│   │           ├── optimizer-reformulation.txt
-│   │           ├── optimizer-complexity.txt
-│   │           ├── compliance-checker.txt
-│   │           ├── compliance-awareness.txt
-│   │           └── knowledge-handler.txt
-│   └── test/
-│       └── java/com/spherecast/agnes/
-│           └── service/
-│               └── GraphServiceTest.java
-├── agnes-frontend/
-│   ├── src/
-│   │   ├── App.jsx                            # Root component + routing
-│   │   ├── components/
-│   │   │   ├── ChatView.jsx                   # Chat interface
-│   │   │   ├── GraphExplorer.jsx              # Graph visualization
-│   │   │   ├── GraphSidebar.jsx               # View selector + company filter
-│   │   │   └── MessageBubble.jsx              # Markdown message renderer
-│   │   └── main.jsx
-│   ├── package.json
-│   └── vite.config.js
-├── db.sqlite                                  # Supply chain database (not in repo)
-├── pom.xml
-└── README.md
-```
+Agnes is designed as a foundation that can scale and improve over time:
 
----
-
-## Configuration
-
-| Property | Env var | Default | Description |
-|---|---|---|---|
-| `anthropic.api-key` | `ANTHROPIC_API_KEY` | — | Anthropic API key (required for AI features) |
-| `anthropic.model` | `ANTHROPIC_MODEL` | `claude-opus-4-5` | Claude model ID |
-| `spring.datasource.url` | — | `jdbc:sqlite:db.sqlite` | Path to the SQLite database |
-| `server.port` | — | `8080` | Backend HTTP port |
-
----
-
-## Development Notes
-
-- **Prompts are cached** via Spring `@Cacheable`. After editing any `.txt` file in `src/main/resources/prompts/`, restart the backend for changes to take effect.
-- **SqlGuard** blocks any SQL statement that is not a `SELECT`. It also rejects statements containing `--`, `;`, or subquery patterns that could escape the read-only boundary.
-- **Wave execution** uses `CompletableFuture` with a virtual-thread executor. Wave 2 optimizers receive Wave 1 results via `OptimizerContext.priorResults()`.
-- **MAX_FINDINGS = 1** per optimizer caps the findings list in Java after Claude's response is parsed. Changing this also changes the compliance prompt size proportionally.
-- **iHerb lookups** return stub data by default when the live endpoint is unavailable. The stub reason is surfaced in the compliance report.
+- **Scalable data retrieval** — At the current data volume, Agnes loads targeted DB context via smart SQL scoping. When scaling to larger datasets, the architecture is designed to introduce RAG (Retrieval-Augmented Generation) for more efficient data retrieval — replacing or augmenting direct SQL context loading without changing the compliance or optimizer architecture.
+- **Multi-region regulatory support** — The compliance engine currently targets EU 1169/2011 but the lookup-service pattern generalizes to FDA, Codex Alimentarius, or other regulatory frameworks.
+- **Agentic enrichment workflows** — Future iterations could have Agnes autonomously retrieve, verify, and structure missing evidence from the web — scraping supplier spec sheets, parsing CoA PDFs, or querying certification databases — rather than relying on pre-integrated APIs.
